@@ -225,7 +225,7 @@ void Update_Frog()
 			game->getFrog()->moveUp();
 			game->getFrog()->decrementLane();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(70));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
@@ -237,7 +237,7 @@ void Update_Frog()
 			game->getFrog()->moveDown();
 			game->getFrog()->incrementLane();
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(70));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		frog_mutex.unlock();
 

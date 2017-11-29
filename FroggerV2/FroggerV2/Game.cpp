@@ -27,16 +27,16 @@ Game::Game()
 			int differential = (rand() % FROG_SIZE) + 4;
 			traffic[i].push_back(new Car(j*FROG_SIZE+differential + j*(FROG_SIZE+differential), (i+1)*FROG_SIZE, speed, sf::Color::Black)); 
 			traffic[i][j]->setLane(i);
-			traffic[i][j]->setSpeed(speed);
+traffic[i][j]->setSpeed(speed);
 		}
 	}
 
 	frog = new Frog(); //create new frog 
 
 					   //create window
-	window = new sf::RenderWindow(	sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
-									"Frogger",
-									sf::Style::Default);
+	window = new sf::RenderWindow(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
+		"Frogger",
+		sf::Style::Default);
 }
 
 
@@ -66,6 +66,17 @@ void Game::setEndOfGame(bool endOfGame)
 {
 	this->endOfGame = endOfGame;
 }
+
+//helper function to detect intersections between traffic and frog
+bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
+{
+	sf::FloatRect shape1 = rect1.getGlobalBounds();
+	sf::FloatRect shape2 = rect2.getGlobalBounds();
+
+	return (shape1.intersects(shape2) || shape2.intersects(shape1));
+}
+
+
 bool Game::detectLeftCollision()
 {
 	if (frog->getLane() == NUMBER_OF_LANES + 1 || frog->getLane() == 0)
@@ -97,9 +108,14 @@ bool Game::detectRightCollision()
 }
 bool Game::detectUpCollision()
 {
+	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
+	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
+	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y + frog->getJump());
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
+		/*
 			//check right x bound
 			if (frog->getShape()->getPosition().x + FROG_SIZE  <= traffic.at(frog->getLane() - 1).at(j)->getShape()->getPosition().x + traffic.at(frog->getLane() - 1).at(j)->getSpeed() + CAR_WIDTH)
 			{
@@ -109,7 +125,13 @@ bool Game::detectUpCollision()
 					return true;
 				}
 			}
-		
+
+		*/
+		if (intersects(tempFrog, *traffic.at(frog->getLane() - 1).at(j)->getShape()))
+		{
+			return true;
+		}
+
 	}
 	
 	return false;

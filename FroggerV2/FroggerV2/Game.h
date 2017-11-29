@@ -32,6 +32,9 @@ public:
 	void setEndOfGame(bool endOfGame);
 
 	sf::RenderWindow* getWindow();
+
+	bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
+
 	//collision detection
 	bool detectLeftCollision();
 	bool detectRightCollision();
