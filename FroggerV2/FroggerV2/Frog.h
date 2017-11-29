@@ -10,6 +10,7 @@ class Frog {
 private:
 	sf::RectangleShape *shape;
 	const int jump_length = VEHICLE_LENGTH;
+	const int horiz_jump = 4;
 	int lane;
 
 public:
@@ -18,6 +19,7 @@ public:
 
 	sf::RectangleShape* getShape();
 	const int getJump();
+	const int getHorizJump();
 	int getLane();
 	void Frog::incrementLane();
 	void Frog::decrementLane();

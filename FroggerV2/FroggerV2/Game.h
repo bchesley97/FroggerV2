@@ -17,6 +17,9 @@ private:
 	sf::RenderWindow *window;
 
 	bool endOfGame;
+	int difficulty;
+
+
 
 public:
 	Game();

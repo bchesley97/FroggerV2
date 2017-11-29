@@ -25,7 +25,6 @@ Game *game;
 
 //extern Frog frog; //to be implemented later (by not me, hopefully)
 
-//Vehicle **traffic[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES]; //array of all vehicles and lanes corresponding to those vehicles
 
 std::mutex traffic_mutex; //mutex semaphore for traffic array 
 
@@ -84,9 +83,13 @@ void Draw_All_Objects() {
 	//open window
 
 	game->getWindow()->setActive(true);
-	game->getWindow()->setFramerateLimit(60); //60 fps
-	while (game->getWindow()->isOpen()) {
+	game->getWindow()->setFramerateLimit(100); //60 fps
 
+	window_mutex.lock();
+	while (game->getWindow()->isOpen()) {
+		
+		window_mutex.unlock();
+		
 		sf::Event event;
 		window_mutex.lock();
 		while (game->getWindow()->pollEvent(event)) {
@@ -100,14 +103,11 @@ void Draw_All_Objects() {
 		window_mutex.unlock();
 		for (int i = 0; i < NUMBER_OF_LANES; i++)
 		{
-
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
-
-
 				traffic_mutex.lock();
 				//sf::RectangleShape rect = ((*game->getTraffic())[i][j]->getShape());
-				std::vector< Vehicle *> Vehicles = game->getTraffic()[i];
+				std::vector< Vehicle *> Vehicles = game->getTraffic().at(i);
 				Vehicle *specificVehicle = Vehicles.at(j);
 				sf::RectangleShape rectangle = *specificVehicle->getShape();
 
@@ -116,37 +116,21 @@ void Draw_All_Objects() {
 				window_mutex.unlock();
 
 				traffic_mutex.unlock(); //release semaphore
-										//window.display();
-
 			}
-
 		}
 
-
 		//draw frog
+		window_mutex.lock();
 		frog_mutex.lock();
 		game->getWindow()->draw(*game->getFrog()->getShape());
 		frog_mutex.unlock();
 		game->getWindow()->display();
+		window_mutex.unlock();
 
 
+		std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-		/*
-		window.clear(BACK_COLOR);
-		window.draw(sf::RectangleShape(sf::Vector2f(50, 50)));
-		window.display();
-		*/
-
-		//	window.draw();
-
-		//window.display();
-
-
-		//car->setPosition(car->getPosition() + sf::Vector2f (car->getSpeed(), car->getSpeed()))
-		//rectangle.setPosition(car->getCenterX(), car->getCenterY());
-
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		window_mutex.lock();
 	}
 
 
@@ -157,15 +141,22 @@ void Draw_All_Objects() {
 void Update_Traffic() {
 
 	Vehicle *car;
+	sf::Clock clock;
+
+	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 
 	while (1)
 	{
+		float delta_time[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
+
 		for (int i = 0; i < NUMBER_OF_LANES; i++)
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
 				traffic_mutex.lock();
 				car = ((game->getTraffic())[i][j]);
+				float delta_time= clocks[i][j].restart().asMilliseconds();
+
 				//position is the left most point I thinK????? CHECK
 				if (car->getShape()->getPosition().x >(WINDOW_MAX_X))
 				{
@@ -180,15 +171,12 @@ void Update_Traffic() {
 				}
 				else
 				{
-					car->getShape()->move(car->getSpeed(), 0);
-
+					car->getShape()->move(car->getSpeed() * delta_time/100, 0);
 				}
 				traffic_mutex.unlock(); //release semaphore
 			}
-
 		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(20)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
+		std::this_thread::sleep_for(std::chrono::milliseconds(75)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
 	}
 
 }
@@ -228,9 +216,10 @@ void Update_Frog()
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-			//game->setEndOfGame(game->detectUpCollision());
+		//	game->setEndOfGame(game->detectUpCollision());
 			if (game->did_game_end())
 			{
+				game->setEndOfGame(true);
 				break;
 			}
 			game->getFrog()->moveUp();
@@ -249,11 +238,7 @@ void Update_Frog()
 			game->getFrog()->incrementLane();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(70));
-
-
 		}
-
-
 		frog_mutex.unlock();
 
 		endOfGame_mutex.unlock();
@@ -274,13 +259,14 @@ void End_Game()
 void Debug_Draw()
 {
 	sf::RectangleShape *shape = new sf::RectangleShape(sf::Vector2f(5, 5));
-	//shape.setPosition(750.f, 750.f);
-	//shape.setOrigin(750.f, 750.f);
+
+
 	shape->setFillColor(sf::Color::Black);
 
 	sf::RenderWindow window(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
-		"Frogger",
-		sf::Style::Default);
+							"Frogger",
+							sf::Style::Default);
+
 	shape->setPosition(100.f, 200.f);
 
 	while (window.isOpen())
@@ -303,8 +289,6 @@ void Debug_Draw()
 		window.display();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(500)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
-
-
 	}
 
 }

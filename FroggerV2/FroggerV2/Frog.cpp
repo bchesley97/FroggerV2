@@ -7,7 +7,7 @@ Frog::Frog()
 	shape = new sf::RectangleShape(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	shape->setFillColor(sf::Color::Green); //frogs are usually green
 	shape->setPosition(WINDOW_MAX_X / 2, WINDOW_MAX_Y - FROG_SIZE);
-	lane = NUMBER_OF_LANES + 1;
+	lane = NUMBER_OF_LANES;
 }
 
 sf::RectangleShape* Frog::getShape()
@@ -19,6 +19,10 @@ sf::RectangleShape* Frog::getShape()
 const int Frog::getJump()
 {
 	return jump_length;
+}
+const int Frog::getHorizJump()
+{
+	return horiz_jump;
 }
 int Frog::getLane()
 {
@@ -35,12 +39,12 @@ void Frog::decrementLane()
 
 void Frog::moveLeft()
 {
-	shape->move(-VEHICLE_LENGTH, 0);
+	shape->move(-horiz_jump, 0);
 
 }
 void Frog::moveRight()
 {
-	shape->move(VEHICLE_LENGTH, 0);
+	shape->move(horiz_jump, 0);
 
 }
 void Frog::moveUp()
