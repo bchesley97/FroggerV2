@@ -17,8 +17,6 @@ void Update_Traffic();
 void Update_Frog();
 
 void End_Game();
-
-void Debug_Draw();
 /**************************** Global Variables *******************************/
 
 Game *game;
@@ -46,6 +44,12 @@ int main() {
 
 	startGame.join(); //to have main not run as a thread 
 					  //	return 0;
+
+
+	//if game got here, means game is over and need to restart
+	std::thread newStartGame(StartGameThread);
+	newStartGame.detach();
+
 
 }
 
@@ -79,6 +83,9 @@ void Draw_All_Objects() {
 
 	std::thread updateThread(Update_Traffic);
 	std::thread frogThread(Update_Frog);
+
+
+	//detach?? Not sure if works properly
 
 	//open window
 
@@ -130,7 +137,7 @@ void Draw_All_Objects() {
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-		window_mutex.lock();
+window_mutex.lock();
 	}
 
 
@@ -155,10 +162,10 @@ void Update_Traffic() {
 			{
 				traffic_mutex.lock();
 				car = ((game->getTraffic())[i][j]);
-				float delta_time= clocks[i][j].restart().asMilliseconds();
+				float delta_time = clocks[i][j].restart().asMilliseconds();
 
 				//position is the left most point I thinK????? CHECK
-				if (car->getShape()->getPosition().x >(WINDOW_MAX_X))
+				if (car->getShape()->getPosition().x > (WINDOW_MAX_X))
 				{
 					//car->getShape()-> setOrigin(CAR_WIDTH_D2, car->getShape()->getPosition().y);
 					car->getShape()->setPosition(CAR_WIDTH_D2, car->getShape()->getPosition().y);
@@ -171,7 +178,7 @@ void Update_Traffic() {
 				}
 				else
 				{
-					car->getShape()->move(car->getSpeed() * delta_time/100, 0);
+					car->getShape()->move(car->getSpeed() * delta_time / 100, 0);
 				}
 				traffic_mutex.unlock(); //release semaphore
 			}
@@ -184,13 +191,16 @@ void Update_Traffic() {
 //check for collisions in this thread
 void Update_Frog()
 {
+
+	bool movedHoriz = false;
 	while (1)
 	{
 		endOfGame_mutex.lock();
 		frog_mutex.lock();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
-			//game->setEndOfGame(game->detectLeftCollision());
+			movedHoriz = true;
+			game->setEndOfGame(game->detectLeftCollision());
 			if (game->did_game_end())
 			{
 				break;
@@ -203,8 +213,8 @@ void Update_Frog()
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
-
-			//game->setEndOfGame(game->detectRightCollision());
+			movedHoriz = true;
+			game->setEndOfGame(game->detectRightCollision());
 			if (game->did_game_end())
 			{
 				break;
@@ -216,7 +226,7 @@ void Update_Frog()
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-		//	game->setEndOfGame(game->detectUpCollision());
+			game->setEndOfGame(game->detectUpCollision());
 			if (game->did_game_end())
 			{
 				game->setEndOfGame(true);
@@ -225,11 +235,16 @@ void Update_Frog()
 			game->getFrog()->moveUp();
 			game->getFrog()->decrementLane();
 
+			if (game->getFrog()->getLane() == 0)
+			{
+			break; //won the game 
+			}
+
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
-			//game->setEndOfGame(game->detectBottomCollision());
+			game->setEndOfGame(game->detectBottomCollision());
 			if (game->did_game_end())
 			{
 				break;
@@ -239,6 +254,13 @@ void Update_Frog()
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
+
+		if (!movedHoriz && game->detectTrafficCollision())
+		{
+			game->setEndOfGame(true);
+			break;
+		}
+		movedHoriz = false;
 		frog_mutex.unlock();
 
 		endOfGame_mutex.unlock();
@@ -246,49 +268,14 @@ void Update_Frog()
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	}
 
-	std::thread endGame(End_Game);
+	//std::thread endGame(End_Game);
 
 }
 
+//end of game thread, will display menu and redisplay choices
 void End_Game()
 {
 
 
 }
 
-void Debug_Draw()
-{
-	sf::RectangleShape *shape = new sf::RectangleShape(sf::Vector2f(5, 5));
-
-
-	shape->setFillColor(sf::Color::Black);
-
-	sf::RenderWindow window(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
-							"Frogger",
-							sf::Style::Default);
-
-	shape->setPosition(100.f, 200.f);
-
-	while (window.isOpen())
-	{
-
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
-
-		window.clear(sf::Color::White);
-		//shape->setPosition(0.f, 0.f);
-		//window.draw(*shape);
-		shape->move(5, 0);
-		window.draw(*shape);
-		window.display();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(500)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
-	}
-
-}

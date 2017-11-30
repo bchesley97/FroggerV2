@@ -27,7 +27,7 @@ Game::Game()
 			int differential = (rand() % FROG_SIZE) + 4;
 			traffic[i].push_back(new Car(j*FROG_SIZE+differential + j*(FROG_SIZE+differential), (i+1)*FROG_SIZE, speed, sf::Color::Black)); 
 			traffic[i][j]->setLane(i);
-traffic[i][j]->setSpeed(speed);
+			traffic[i][j]->setSpeed(speed);
 		}
 	}
 
@@ -76,57 +76,64 @@ bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
 	return (shape1.intersects(shape2) || shape2.intersects(shape1));
 }
 
+//THESE COLLISION FUNCTIONS ARE FOR WHEN THE FROG MOVES
 
 bool Game::detectLeftCollision()
 {
-	if (frog->getLane() == NUMBER_OF_LANES + 1 || frog->getLane() == 0)
+	if (frog->getLane() == NUMBER_OF_LANES  || frog->getLane() == 0)
 		return false;
 
+	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
+	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
+	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
+	tempFrog.setPosition(frog->getShape()->getPosition().x - frog->getHorizJump(), frog->getShape()->getPosition().y);
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
-		if ((frog->getShape()->getPosition().x - frog->getJump()) <= traffic.at(frog->getLane()).at(j)->getShape()->getPosition().x - traffic.at(frog->getLane()).at(j)->getSpeed())
+
+		if (intersects(tempFrog, *traffic.at(frog->getLane()).at(j)->getShape()))
 		{
 			return true;
 		}
+
 	}
+
 	return false;
 
 }
 bool Game::detectRightCollision()
 {
-	if (frog->getLane() == NUMBER_OF_LANES + 1 || frog->getLane() == 0)
+	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() == 0)
 		return false;
+
+	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
+	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
+	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
+	tempFrog.setPosition(frog->getShape()->getPosition().x + frog->getHorizJump(), frog->getShape()->getPosition().y);
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
-		if ((frog->getShape()->getPosition().x + frog->getJump() + FROG_SIZE) >= traffic.at(frog->getLane()).at(j)->getShape()->getPosition().x + traffic.at(frog->getLane()).at(j)->getSpeed())
+
+		if (intersects(tempFrog, *traffic.at(frog->getLane()).at(j)->getShape()))
+		{
 			return true;
+		}
+
 	}
 
 	return false;
+
 }
 bool Game::detectUpCollision()
 {
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
 	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
-	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y + frog->getJump());
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y - frog->getJump());
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
-		/*
-			//check right x bound
-			if (frog->getShape()->getPosition().x + FROG_SIZE  <= traffic.at(frog->getLane() - 1).at(j)->getShape()->getPosition().x + traffic.at(frog->getLane() - 1).at(j)->getSpeed() + CAR_WIDTH)
-			{
-				//check left x bound
-				if (frog->getShape()->getPosition().x >= traffic.at(frog->getLane() - 1).at(j)->getShape()->getPosition().x + traffic.at(frog->getLane() - 1).at(j)->getSpeed())
-				{
-					return true;
-				}
-			}
-
-		*/
+	
 		if (intersects(tempFrog, *traffic.at(frog->getLane() - 1).at(j)->getShape()))
 		{
 			return true;
@@ -138,12 +145,40 @@ bool Game::detectUpCollision()
 }
 bool Game::detectBottomCollision()
 {
+	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
+	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
+	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y + frog->getJump());
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
-		if ((frog->getShape()->getPosition().y + frog->getJump()) + FROG_SIZE >= traffic.at(frog->getLane() + 1).at(j)->getShape()->getPosition().y)
+
+		if (intersects(tempFrog, *traffic.at(frog->getLane() + 1).at(j)->getShape()))
+		{
 			return true;
+		}
+
 	}
 
 	return false;
 }
+
+//THESE COLLISION FUNCTIONS ARE FOR THE TRAFFIC, IE WHEN THE TRAFFIC IS MOVING
+
+bool Game::detectTrafficCollision()
+{
+	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() == 0)
+		return false;
+
+	//only need to check if the traffic collided in the current lane of the frog
+	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
+	{
+		if (intersects(*frog->getShape(), *traffic.at(frog->getLane()).at(j)->getShape()))
+			return true;
+	}
+
+	return false;
+
+}
+
+

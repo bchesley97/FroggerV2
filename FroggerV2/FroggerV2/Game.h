@@ -7,6 +7,10 @@
 #include <vector>
 #include "Frog.h"
 
+/***************** Helper functions **********************/
+bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
+
+
 class Game {
 
 private:
@@ -33,7 +37,6 @@ public:
 
 	sf::RenderWindow* getWindow();
 
-	bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
 
 	//collision detection
 	bool detectLeftCollision();
@@ -41,6 +44,7 @@ public:
 	bool detectUpCollision();
 	bool detectBottomCollision();
 
+	bool Game::detectTrafficCollision();
 
 };
 

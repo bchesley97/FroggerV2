@@ -10,7 +10,7 @@ class Frog {
 private:
 	sf::RectangleShape *shape;
 	const int jump_length = VEHICLE_LENGTH;
-	const int horiz_jump = 4;
+	const int horiz_jump = VEHICLE_LENGTH;
 	int lane;
 
 public:

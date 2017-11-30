@@ -48,10 +48,17 @@ defines for traffic
 #define MAX_VEHICLE_SPEED 5 // max speed of vehicles is 5 pixel "jumps" 
 
 
+/****************** Defines for lilies ******************/
+
+#define LILY_PAD_LENGTH (FROG_SIZE)
+#define MIN_LILY_PAD_WIDTH (FROG_SIZE + FROG_SIZE/2)
+#define MAX_NUM_LILY_LANES ((int)(NUMBER_OF_LANES / 4))
+
 
 /************************* Data Structures *************************/
 
 
+/********************************** Helper Functions **********************/
 
 
 #endif
