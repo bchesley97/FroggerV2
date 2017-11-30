@@ -106,7 +106,7 @@ void Draw_All_Objects() {
 			}
 		}
 
-		game->getWindow()->clear(sf::Color::White);
+		game->updateScreen();
 		window_mutex.unlock();
 		for (int i = 0; i < NUMBER_OF_LANES; i++)
 		{

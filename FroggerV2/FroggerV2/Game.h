@@ -23,6 +23,9 @@ private:
 	bool endOfGame;
 	int difficulty;
 
+	//rectangles for the arena
+	sf::RectangleShape *road;
+	sf::RectangleShape *water;
 
 
 public:
@@ -37,6 +40,7 @@ public:
 
 	sf::RenderWindow* getWindow();
 
+	void Game::updateScreen();
 
 	//collision detection
 	bool detectLeftCollision();

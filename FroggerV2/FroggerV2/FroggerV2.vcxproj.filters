@@ -33,6 +33,12 @@
     <ClCompile Include="Arena.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="Logs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleRoundEdges.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h">
@@ -45,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vehicle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangleRoundEdges.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -33,6 +33,16 @@ Game::Game()
 
 	frog = new Frog(); //create new frog 
 
+	//create new rectagngles for arena 
+	road = new sf::RectangleShape(sf::Vector2f(WINDOW_MAX_X, WINDOW_MAX_Y/2));
+	road->setPosition(sf::Vector2f(0, WINDOW_MAX_Y / 2)); //at the bottom half of the screen
+	road->setFillColor(sf::Color::White);
+
+
+	water = new sf::RectangleShape(sf::Vector2f(WINDOW_MAX_X, WINDOW_MAX_Y / 2));
+	water->setPosition(0, 0); //at the top of the screen
+	water->setFillColor(sf::Color::Blue); //water is usually blue (in the U.S., anyways) 
+
 					   //create window
 	window = new sf::RenderWindow(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
 		"Frogger",
@@ -66,6 +76,16 @@ void Game::setEndOfGame(bool endOfGame)
 {
 	this->endOfGame = endOfGame;
 }
+
+//this will redraw the arena, use it as a window.clear()
+void Game::updateScreen()
+{
+	this->window->clear(sf::Color::White);
+	this->window->draw(*water); //redraw arena
+	this->window->draw(*road);
+
+}
+
 
 //helper function to detect intersections between traffic and frog
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)

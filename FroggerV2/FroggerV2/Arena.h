@@ -43,7 +43,6 @@ defines for traffic
 #define SPACE_BETWEEN_LANES (4)
 
 #define NUMBER_OF_LANES ((int)(WINDOW_MAX_Y/VEHICLE_LENGTH) - 2) //NUMBER OF LANES OF TRAFFIC, 2 free lanes for frog starting and ending position
-#define NUMBER_OF_LANES_W_SPACE NUMBER_OF_LANES/(SPACE_BETWEEN_LANES)
 
 #define MAX_VEHICLE_SPEED 5 // max speed of vehicles is 5 pixel "jumps" 
 
@@ -53,6 +52,10 @@ defines for traffic
 #define LILY_PAD_LENGTH (FROG_SIZE)
 #define MIN_LILY_PAD_WIDTH (FROG_SIZE + FROG_SIZE/2)
 #define MAX_NUM_LILY_LANES ((int)(NUMBER_OF_LANES / 4))
+
+
+#define LOG_LENGTH (FROG_SIZE)
+#define MIN_LOG_WIDTH (FROG_SIZE+FROG_SIZE/2)
 
 
 /************************* Data Structures *************************/

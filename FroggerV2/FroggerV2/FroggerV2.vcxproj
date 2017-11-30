@@ -14,14 +14,18 @@
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="Frog.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Logs.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Arena.h" />
+    <ClCompile Include="RectangleRoundEdges.cpp" />
     <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
     <ClInclude Include="Frog.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Logs.h" />
+    <ClInclude Include="RectangleRoundEdges.h" />
     <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
