@@ -1,35 +1,12 @@
 #include "Game.h"
 #include "Frog.h"
+#include "Traffic.h"
 
 Game::Game()
 {
 
 	//initialize traffic vector
-	for (int i = 0; i<NUMBER_OF_LANES; i++)
-	{
-		traffic.push_back(std::vector<Vehicle*>());
-		int speed = (rand() % 2);
-		int xPosition = 0;
-		//determine whether to make speed negative (and thus start on the right side of the screen
-		if (speed)
-		{
-			speed = -((rand() % MAX_VEHICLE_SPEED) + 1);
-
-		}
-		else
-		{
-			speed = (rand() % MAX_VEHICLE_SPEED) + 1;
-
-		}
-
-		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
-		{
-			int differential = (rand() % FROG_SIZE) + 4;
-			traffic[i].push_back(new Car(j*FROG_SIZE+differential + j*(FROG_SIZE+differential), (i+1)*FROG_SIZE, speed, sf::Color::Black)); 
-			traffic[i][j]->setLane(i);
-			traffic[i][j]->setSpeed(speed);
-		}
-	}
+	traffic = *new Traffic();
 
 	frog = new Frog(); //create new frog 
 
@@ -43,10 +20,19 @@ Game::Game()
 	water->setPosition(0, 0); //at the top of the screen
 	water->setFillColor(sf::Color::Blue); //water is usually blue (in the U.S., anyways) 
 
+	//create lillies (land on to win game)
+	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
+	{
+		lillies.push_back(*new sf::RectangleShape(sf::Vector2f(LILY_PAD_WIDTH, LILY_PAD_LENGTH)));
+		lillies.at(i).setFillColor(sf::Color(102, 238, 148,255)); //some kind of light green
+		lillies.at(i).setPosition(i * 2 * LILY_PAD_WIDTH, 0); //at top of arena
+	}
+
+
 					   //create window
-	window = new sf::RenderWindow(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
-		"Frogger",
-		sf::Style::Default);
+	window = new sf::RenderWindow(	sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
+									"Frogger",
+									sf::Style::Default);
 }
 
 
@@ -57,7 +43,7 @@ sf::RenderWindow* Game::getWindow()
 
 
 
-std::vector<std::vector<Vehicle*> > Game::getTraffic()
+Traffic Game::getTraffic()
 {
 	return traffic;
 
@@ -77,12 +63,22 @@ void Game::setEndOfGame(bool endOfGame)
 	this->endOfGame = endOfGame;
 }
 
+std::vector<sf::RectangleShape> *Game:: getLillies()
+{
+	return &lillies;
+
+}
 //this will redraw the arena, use it as a window.clear()
 void Game::updateScreen()
 {
 	this->window->clear(sf::Color::White);
 	this->window->draw(*water); //redraw arena
 	this->window->draw(*road);
+	
+	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
+	{
+		this->window->draw(lillies.at(i));
+	}
 
 }
 
@@ -96,7 +92,7 @@ bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
 	return (shape1.intersects(shape2) || shape2.intersects(shape1));
 }
 
-//THESE COLLISION FUNCTIONS ARE FOR WHEN THE FROG MOVES
+//THESE COLLISION FUNCTIONS ARE FOR WHEN THE FROG MOVES FOR THE TRAFFIC SIDE OF ARENA
 
 bool Game::detectLeftCollision()
 {
@@ -106,12 +102,13 @@ bool Game::detectLeftCollision()
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
 	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
-	tempFrog.setPosition(frog->getShape()->getPosition().x - frog->getHorizJump(), frog->getShape()->getPosition().y);
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
+	int newLane = NUMBER_OF_LANES - frog->getLane() + NUMBER_OF_LANES / 2 - 2;
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 
-		if (intersects(tempFrog, *traffic.at(frog->getLane()).at(j)->getShape()))
+		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
 			return true;
 		}
@@ -129,12 +126,14 @@ bool Game::detectRightCollision()
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
 	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
-	tempFrog.setPosition(frog->getShape()->getPosition().x + frog->getHorizJump(), frog->getShape()->getPosition().y);
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
+	int newLane = NUMBER_OF_LANES - frog->getLane() + NUMBER_OF_LANES / 2 - 2;
+
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 
-		if (intersects(tempFrog, *traffic.at(frog->getLane()).at(j)->getShape()))
+		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
 			return true;
 		}
@@ -149,12 +148,14 @@ bool Game::detectUpCollision()
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
 	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
-	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y - frog->getJump());
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
+
+	int newLane =NUMBER_OF_LANES - frog->getLane() + NUMBER_OF_LANES/2 -1;
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 	
-		if (intersects(tempFrog, *traffic.at(frog->getLane() - 1).at(j)->getShape()))
+		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
 			return true;
 		}
@@ -168,12 +169,13 @@ bool Game::detectBottomCollision()
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
 	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
-	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y + frog->getJump());
+	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
+	int newLane = NUMBER_OF_LANES - frog->getLane() + NUMBER_OF_LANES / 2 + 1;
 
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 
-		if (intersects(tempFrog, *traffic.at(frog->getLane() + 1).at(j)->getShape()))
+		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
 			return true;
 		}
@@ -187,13 +189,14 @@ bool Game::detectBottomCollision()
 
 bool Game::detectTrafficCollision()
 {
-	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() == 0)
+	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() < NUMBER_OF_LANES/2)
 		return false;
 
+	int newLane = NUMBER_OF_LANES - frog->getLane() + NUMBER_OF_LANES / 2 -2 ;
 	//only need to check if the traffic collided in the current lane of the frog
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
-		if (intersects(*frog->getShape(), *traffic.at(frog->getLane()).at(j)->getShape()))
+		if (intersects(*frog->getShape(), *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 			return true;
 	}
 

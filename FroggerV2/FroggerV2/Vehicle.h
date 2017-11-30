@@ -24,7 +24,7 @@ class Vehicle {
 private:
 
 	int speed; //THIS SPEED IS IN PIXELS/SECOND
-	int width_d2;
+	//int width_d2;
 	int lane;
 	sf::RectangleShape *shape;
 

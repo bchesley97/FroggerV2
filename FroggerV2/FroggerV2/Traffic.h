@@ -19,7 +19,10 @@ private:
 
 public:
 
-
+	//constructor
+	Traffic();
+	std::vector<std::vector<Vehicle*> > *getRoadTraffic();
+	std::vector<std::vector<Log*> > *getLogTraffic();
 
 
 };

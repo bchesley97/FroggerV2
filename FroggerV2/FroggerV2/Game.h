@@ -6,7 +6,7 @@
 #include "Car.h"
 #include <vector>
 #include "Frog.h"
-
+#include "Traffic.h"
 /***************** Helper functions **********************/
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
 
@@ -17,7 +17,7 @@ private:
 
 	Frog *frog;
 
-	std::vector<std::vector<Vehicle*> > traffic;
+	Traffic traffic;
 	sf::RenderWindow *window;
 
 	bool endOfGame;
@@ -26,12 +26,14 @@ private:
 	//rectangles for the arena
 	sf::RectangleShape *road;
 	sf::RectangleShape *water;
+	
+	std::vector<sf::RectangleShape> lillies;
 
 
 public:
 	Game();
 
-	std::vector <std::vector<Vehicle*> > Game::getTraffic();
+	Traffic getTraffic();
 
 	Frog* Game::getFrog();
 
@@ -39,6 +41,8 @@ public:
 	void setEndOfGame(bool endOfGame);
 
 	sf::RenderWindow* getWindow();
+
+	std::vector<sf::RectangleShape> *getLillies();
 
 	void Game::updateScreen();
 

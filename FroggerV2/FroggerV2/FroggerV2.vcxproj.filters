@@ -39,6 +39,9 @@
     <ClCompile Include="RectangleRoundEdges.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Traffic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RectangleRoundEdges.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Traffic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

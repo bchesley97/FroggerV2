@@ -108,18 +108,20 @@ void Draw_All_Objects() {
 
 		game->updateScreen();
 		window_mutex.unlock();
-		for (int i = 0; i < NUMBER_OF_LANES; i++)
+		for (int i = 0; i < NUMBER_OF_LANES/2; i++)
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
 				traffic_mutex.lock();
 				//sf::RectangleShape rect = ((*game->getTraffic())[i][j]->getShape());
-				std::vector< Vehicle *> Vehicles = game->getTraffic().at(i);
+				std::vector< Vehicle *> Vehicles = game->getTraffic().getRoadTraffic()->at(i);
 				Vehicle *specificVehicle = Vehicles.at(j);
 				sf::RectangleShape rectangle = *specificVehicle->getShape();
 
 				window_mutex.lock();
 				game->getWindow()->draw(rectangle); //draw all the traffic 
+				game->getWindow()->draw(*game->getTraffic().getLogTraffic()->at(i).at(j)->getShape());
+				
 				window_mutex.unlock();
 
 				traffic_mutex.unlock(); //release semaphore
@@ -148,6 +150,7 @@ window_mutex.lock();
 void Update_Traffic() {
 
 	Vehicle *car;
+	Log *log;
 	sf::Clock clock;
 
 	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
@@ -156,12 +159,12 @@ void Update_Traffic() {
 	{
 		float delta_time[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 
-		for (int i = 0; i < NUMBER_OF_LANES; i++)
+		for (int i = 0; i < NUMBER_OF_LANES/2; i++)
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
 				traffic_mutex.lock();
-				car = ((game->getTraffic())[i][j]);
+				car = ((game->getTraffic().getRoadTraffic())->at(i).at(j));
 				float delta_time = clocks[i][j].restart().asMilliseconds();
 
 				//position is the left most point I thinK????? CHECK
@@ -180,6 +183,27 @@ void Update_Traffic() {
 				{
 					car->getShape()->move(car->getSpeed() * delta_time / 100, 0);
 				}
+
+				//update position of logs
+				log = ((game->getTraffic().getLogTraffic())->at(i).at(j));
+				delta_time = clocks[i+(int)(NUMBER_OF_LANES/2)][j].restart().asMilliseconds();
+
+				//position is the left most point I thinK????? CHECK
+				if (log->getShape()->getPosition().x > (WINDOW_MAX_X))
+				{
+					log->getShape()->setPosition(CAR_WIDTH_D2, log->getShape()->getPosition().y);
+				}
+
+				else if (log->getShape()->getPosition().x + CAR_WIDTH < (WINDOW_MIN_X))
+				{
+					log->getShape()->setPosition(WINDOW_MAX_X - 2 * CAR_WIDTH_D2, log->getShape()->getPosition().y);
+				}
+				else
+				{
+					log->getShape()->move(log->getSpeed() * delta_time / 100, 0);
+				}
+
+
 				traffic_mutex.unlock(); //release semaphore
 			}
 		}
@@ -200,13 +224,16 @@ void Update_Frog()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			movedHoriz = true;
+			game->getFrog()->moveLeft();
+
 			game->setEndOfGame(game->detectLeftCollision());
 			if (game->did_game_end())
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(70)); //so that the collision can be drawn (easier to tell why you lost)
+
 				break;
 			}
 
-			game->getFrog()->moveLeft();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(70));
 
@@ -214,29 +241,37 @@ void Update_Frog()
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			movedHoriz = true;
+			game->getFrog()->moveRight();
+
 			game->setEndOfGame(game->detectRightCollision());
 			if (game->did_game_end())
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
 				break;
 			}
-			game->getFrog()->moveRight();
 			std::this_thread::sleep_for(std::chrono::milliseconds(70));
 
 
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
+			game->getFrog()->moveUp();
+
 			game->setEndOfGame(game->detectUpCollision());
 			if (game->did_game_end())
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
 				game->setEndOfGame(true);
 				break;
 			}
-			game->getFrog()->moveUp();
 			game->getFrog()->decrementLane();
 
 			if (game->getFrog()->getLane() == 0)
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
 			break; //won the game 
 			}
 
@@ -245,11 +280,14 @@ void Update_Frog()
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 		{
 			game->setEndOfGame(game->detectBottomCollision());
+			game->getFrog()->moveDown();
+
 			if (game->did_game_end())
 			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
 				break;
 			}
-			game->getFrog()->moveDown();
 			game->getFrog()->incrementLane();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -257,6 +295,8 @@ void Update_Frog()
 
 		if (!movedHoriz && game->detectTrafficCollision())
 		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(70));
+
 			game->setEndOfGame(true);
 			break;
 		}

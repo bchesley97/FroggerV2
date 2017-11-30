@@ -11,25 +11,18 @@ private:
 
 	sf::Vector2f size;
 	float radius; //radius of edges
+	uint32_t cornerPointCount;
 
 public:
 
-	RectangleRoundEdges(const sf::Vector2f &size, float rad);
+	RectangleRoundEdges(const sf::Vector2f &size, float rad, uint32_t pointCount);
 	void setSize(const sf::Vector2f &size);
 	void setEdgeRadius(float radius);
 	float getEdgeRadius();
 	sf::Vector2f getSize();
 
-	std::size_t RectangleRoundEdges::getPointCount() const
-	{
-		return 0; //do not plan on using this 
-	}
-
-	sf::Vector2f RectangleRoundEdges::getPoint(std::size_t index) const
-	{
-		return sf::Vector2f(0, 0); //not correct implementation but will 
-	}
-
+	std::size_t RectangleRoundEdges::getPointCount() const;
+	sf::Vector2f RectangleRoundEdges::getPoint(std::size_t index) const;
 };
 
 

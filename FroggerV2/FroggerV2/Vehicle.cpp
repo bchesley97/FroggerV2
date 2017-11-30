@@ -24,7 +24,7 @@ Vehicle::Vehicle(int centerX, int centerY, int speed, int size_d2, sf::Color col
 	this->shape->setPosition(centerX, centerY);
 
 	this->shape->setFillColor(color);
-	this->width_d2 = size_d2;
+	//this->width_d2 = size_d2;
 	//std::cout << "In  vehicle constructor\n";
 
 }

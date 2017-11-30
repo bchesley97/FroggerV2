@@ -20,7 +20,7 @@
 /*
 defines for frog (will probably be changed)
 */
-#define FROG_SIZE (100)
+#define FROG_SIZE (50)
 #define FROG_SIZE_D2 (FROG_SIZE >> 1)
 #define FROG_JUMP (VEHICLE_LENGTH)
 
@@ -36,7 +36,7 @@ defines for traffic
 #define BUS_WIDTH 10
 #define BUS_WIDTH_D2 (BUS_WIDTH>>1)
 
-#define MAX_NUMBER_OF_VEHICLES (WINDOW_MAX_X/(FROG_SIZE)) //max number of vehicles on the screen at all times
+#define MAX_NUMBER_OF_VEHICLES (WINDOW_MAX_X/(2*FROG_SIZE)) //max number of vehicles on the screen at all times
 
 #define MIN_SPACE_BETWEEN_VEHICLES (FROG_SIZE + 6) //minimum space between vehicles
 
@@ -44,14 +44,15 @@ defines for traffic
 
 #define NUMBER_OF_LANES ((int)(WINDOW_MAX_Y/VEHICLE_LENGTH) - 2) //NUMBER OF LANES OF TRAFFIC, 2 free lanes for frog starting and ending position
 
-#define MAX_VEHICLE_SPEED 5 // max speed of vehicles is 5 pixel "jumps" 
+#define MAX_VEHICLE_SPEED 10 // max speed of vehicles is 5 pixel "jumps" 
 
 
 /****************** Defines for lilies ******************/
 
+#define NUMBER_OF_LILLIES (WINDOW_MAX_X/(2*FROG_SIZE))
 #define LILY_PAD_LENGTH (FROG_SIZE)
-#define MIN_LILY_PAD_WIDTH (FROG_SIZE + FROG_SIZE/2)
-#define MAX_NUM_LILY_LANES ((int)(NUMBER_OF_LANES / 4))
+#define LILY_PAD_WIDTH (FROG_SIZE + 10) //ten is "wiggle room" on each side to land on
+
 
 
 #define LOG_LENGTH (FROG_SIZE)

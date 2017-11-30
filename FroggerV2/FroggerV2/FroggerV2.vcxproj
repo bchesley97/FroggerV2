@@ -18,6 +18,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Arena.h" />
     <ClCompile Include="RectangleRoundEdges.cpp" />
+    <ClCompile Include="Traffic.cpp" />
     <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -26,6 +27,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Logs.h" />
     <ClInclude Include="RectangleRoundEdges.h" />
+    <ClInclude Include="Traffic.h" />
     <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
