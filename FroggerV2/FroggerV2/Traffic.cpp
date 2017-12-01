@@ -23,8 +23,13 @@ Traffic::Traffic()
 
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 		{
+			int spacing = 0;
+			if (j != 0)
+			{
+				spacing = logTraffic[i].at(j-1)->getShape()->getSize().x + logTraffic[i].at(j-1)->getShape()->getPosition().x;
+			}
 			int differential = (rand() % FROG_SIZE) + FROG_SIZE;
-			logTraffic[i].push_back(new Log(j*FROG_SIZE + differential + j*(FROG_SIZE + differential), (i + 1)*FROG_SIZE, speed));
+			logTraffic[i].push_back(new Log(spacing + differential, (i + 1)*FROG_SIZE, speed));
 			logTraffic[i][j]->setLane(i);
 			logTraffic[i][j]->setSpeed(speed);
 		}
@@ -50,7 +55,7 @@ Traffic::Traffic()
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 		{
 			int differential = (rand() % FROG_SIZE) + FROG_SIZE;
-			roadTraffic[i].push_back(new Car(j*FROG_SIZE + differential + j*(FROG_SIZE + differential), (i + 1+NUMBER_OF_LANES/2)*FROG_SIZE, speed, sf::Color::Black));
+			roadTraffic[i].push_back(new Car(j*2*FROG_SIZE + differential + j*(FROG_SIZE + differential), (i + 1+NUMBER_OF_LANES/2)*FROG_SIZE, speed, sf::Color::Black));
 			roadTraffic[i][j]->setLane(i+NUMBER_OF_LANES/2);
 			roadTraffic[i][j]->setSpeed(speed);
 		}

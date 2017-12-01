@@ -30,7 +30,7 @@ defines for traffic
 */
 
 #define VEHICLE_LENGTH FROG_SIZE //so that vehicle length and frog size are equal
-#define CAR_WIDTH (2*FROG_SIZE)
+#define CAR_WIDTH (FROG_SIZE)
 #define CAR_WIDTH_D2 (CAR_WIDTH>>1)
 
 #define BUS_WIDTH 10
@@ -56,7 +56,7 @@ defines for traffic
 
 
 #define LOG_LENGTH (FROG_SIZE)
-#define MIN_LOG_WIDTH (FROG_SIZE+FROG_SIZE/2)
+#define MIN_LOG_WIDTH (FROG_SIZE*3)
 
 
 /************************* Data Structures *************************/

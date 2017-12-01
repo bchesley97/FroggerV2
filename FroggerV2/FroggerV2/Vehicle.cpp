@@ -13,10 +13,10 @@ Vehicle::Vehicle() {
 }
 
 
-Vehicle::Vehicle(int centerX, int centerY, int speed, int size_d2, sf::Color color) {
+Vehicle::Vehicle(int centerX, int centerY, int speed, int width, int length, sf::Color color) {
 
 
-	this->shape = new sf::RectangleShape(sf::Vector2f(2*size_d2 , 2*size_d2 ));
+	this->shape = new sf::RectangleShape(sf::Vector2f(width , length ));
 	this->speed = speed;
 	//this->width_d2 = size_d2;
 

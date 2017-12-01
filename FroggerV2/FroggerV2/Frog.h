@@ -12,6 +12,8 @@ private:
 	const int jump_length = VEHICLE_LENGTH;
 	const int horiz_jump = VEHICLE_LENGTH;
 	int lane;
+	int speed; //this variable is only if the frog has jumped on a log
+	int logLane;
 
 public:
 
@@ -21,6 +23,9 @@ public:
 	const int getJump();
 	const int getHorizJump();
 	int getLane();
+	int getLogLane();
+	void setLogLane(int logLane);
+
 	void Frog::incrementLane();
 	void Frog::decrementLane();
 

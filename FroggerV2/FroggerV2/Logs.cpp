@@ -3,7 +3,7 @@
 #include "Arena.h"
 Log::Log(int xPos, int yPos, int speed)
 {
-	int randomWidth = MIN_LOG_WIDTH + (rand() % 10);
+	int randomWidth = MIN_LOG_WIDTH + (rand() % 75);
 	shape = new RectangleRoundEdges(sf::Vector2f(randomWidth, LOG_LENGTH), 10, 30);
 	shape->setPosition(xPos, yPos);
 	

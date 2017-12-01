@@ -13,7 +13,7 @@ Car::Car()
 }
 
 Car::Car(int centerX, int centerY, int speed, sf::Color color)
-	: Vehicle::Vehicle(centerX, centerY, speed, FROG_SIZE_D2, color) {
+	: Vehicle::Vehicle(centerX, centerY, speed, FROG_SIZE, FROG_SIZE, color) {
 
 	//std::cout << "In  car constructor\n";
 	//just calls super classes constructor, but creates two rectangle objects?

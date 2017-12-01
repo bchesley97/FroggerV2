@@ -35,8 +35,8 @@ public:
 
 
 	/* constructor for vehicle */
-	Vehicle(int centerX, int centerY, int speed, int size_d2, sf::Color color);
-	/*
+	Vehicle::Vehicle(int centerX, int centerY, int speed, int width, int length, sf::Color color);
+		/*
 	int getCenterX();
 	int getCenterY();
 	*/

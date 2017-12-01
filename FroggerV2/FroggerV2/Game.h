@@ -53,6 +53,10 @@ public:
 	bool detectBottomCollision();
 
 	bool Game::detectTrafficCollision();
+	int Game::jumpOnLog();
+	bool Game::moveOnLog(bool right);
+	int Game::jumpOffLog();
+
 
 };
 
