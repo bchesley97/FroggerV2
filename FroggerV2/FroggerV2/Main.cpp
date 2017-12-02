@@ -24,13 +24,7 @@ Game *game;
 //extern Frog frog; //to be implemented later (by not me, hopefully)
 
 
-std::mutex traffic_mutex; //mutex semaphore for traffic array 
 
-std::mutex frog_mutex; //mutex semaphore for frog (might need)
-
-std::mutex endOfGame_mutex;
-
-std::mutex window_mutex;
 /******************************** semaphores *********************************/
 
 
@@ -92,13 +86,13 @@ void Draw_All_Objects() {
 	game->getWindow()->setActive(true);
 	game->getWindow()->setFramerateLimit(100); //60 fps
 
-	window_mutex.lock();
+	game->window_mutex.lock();
 	while (game->getWindow()->isOpen()) {
 		
-		window_mutex.unlock();
+		game->window_mutex.unlock();
 		
 		sf::Event event;
-		window_mutex.lock();
+		game->window_mutex.lock();
 		while (game->getWindow()->pollEvent(event)) {
 			if (event.type == sf::Event::Closed)
 			{
@@ -107,39 +101,39 @@ void Draw_All_Objects() {
 		}
 
 		game->updateScreen();
-		window_mutex.unlock();
+		game->window_mutex.unlock();
 		for (int i = 0; i < NUMBER_OF_LANES/2; i++)
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
-				traffic_mutex.lock();
+				game->traffic_mutex.lock();
 				//sf::RectangleShape rect = ((*game->getTraffic())[i][j]->getShape());
 				std::vector< Vehicle *> Vehicles = game->getTraffic().getRoadTraffic()->at(i);
 				Vehicle *specificVehicle = Vehicles.at(j);
 				sf::RectangleShape rectangle = *specificVehicle->getShape();
 
-				window_mutex.lock();
+				game->window_mutex.lock();
 				game->getWindow()->draw(rectangle); //draw all the traffic 
 				game->getWindow()->draw(*game->getTraffic().getLogTraffic()->at(i).at(j)->getShape());
 				
-				window_mutex.unlock();
+				game->window_mutex.unlock();
 				
-				traffic_mutex.unlock(); //release semaphore
+				game->traffic_mutex.unlock(); //release semaphore
 			}
 		}
 
 		//draw frog
-		window_mutex.lock();
-		frog_mutex.lock();
+		game->window_mutex.lock();
+		game->frog_mutex.lock();
 		game->getWindow()->draw(*game->getFrog()->getShape());
-		frog_mutex.unlock();
+		game->frog_mutex.unlock();
 		game->getWindow()->display();
-		window_mutex.unlock();
+		game->window_mutex.unlock();
 
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
-		window_mutex.lock();
+		game->window_mutex.lock();
 	}
 
 
@@ -153,7 +147,6 @@ void Update_Traffic() {
 	Log *log;
 	sf::Clock clock;
 
-	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 	bool offScreen[(NUMBER_OF_LANES)][MAX_NUMBER_OF_VEHICLES] = { false }; //if cars went off the screen
 	int waitTime[(NUMBER_OF_LANES)][MAX_NUMBER_OF_VEHICLES] = { 0 };
 
@@ -166,10 +159,10 @@ void Update_Traffic() {
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
-				traffic_mutex.lock();
+				game->traffic_mutex.lock();
 
 				car = ((game->getTraffic().getRoadTraffic())->at(i).at(j));
-				float delta_time = clocks[i][j].restart().asMilliseconds();
+				float delta_time = game->clocks[i][j].restart().asMilliseconds();
 
 				//position is the left most point I thinK????? CHECK
 				if (car->getShape()->getPosition().x > (WINDOW_MAX_X))
@@ -208,7 +201,19 @@ void Update_Traffic() {
 
 				//update position of logs
 				log = ((game->getTraffic().getLogTraffic())->at(i).at(j));
-				delta_time = clocks[i + (int)(NUMBER_OF_LANES / 2)][j].restart().asMilliseconds();
+				delta_time = game->clocks[i + (int)(NUMBER_OF_LANES / 2)][j].restart().asMilliseconds();
+
+				//reset clock for frog if its on a log
+				if (i == game->getFrog()->getLane() && j == game->getFrog()->getLogLane())
+				{
+					game->frog_mutex.lock();
+					if (i == game->getFrog()->getLane() && j == game->getFrog()->getLogLane())
+						game->getFrog()->getShape()->move(log->getSpeed()*delta_time / 100, 0);
+
+					game->frog_mutex.unlock();
+				}
+
+
 
 				if (log->getShape()->getPosition().x > (WINDOW_MAX_X))
 				{
@@ -221,11 +226,7 @@ void Update_Traffic() {
 				}
 				else
 				{
-					frog_mutex.lock();
-					if (i == game->getFrog()->getLane() && j == game->getFrog()->getLogLane())
-						game->getFrog()->getShape()->move(log->getSpeed()*delta_time/100, 0);
-						
-					frog_mutex.unlock();
+					
 					log->getShape()->move(log->getSpeed() * delta_time / 100, 0);
 					
 				}
@@ -249,7 +250,7 @@ void Update_Traffic() {
 					waitTime[i + (int)(NUMBER_OF_LANES / 2)][j]++;
 				}
 
-				traffic_mutex.unlock(); //release semaphore
+				game->traffic_mutex.unlock(); //release semaphore
 
 			}
 		}
@@ -266,10 +267,11 @@ void Update_Frog()
 	bool onLog = false;
 	bool movedHoriz = false;
 	Log *movingLog = NULL;
+
 	while (1)
 	{
-		endOfGame_mutex.lock();
-		frog_mutex.lock();
+		game->endOfGame_mutex.lock();
+		game->frog_mutex.lock();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			movedHoriz = true;
@@ -284,28 +286,29 @@ void Update_Frog()
 
 					break;
 				}
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			
 			}
 			else
 			{
-				traffic_mutex.lock();
+			//	game->traffic_mutex.lock();
 				if (!game->moveOnLog(0))
 				{
 					game->setEndOfGame(true); //missed the log
+				//	game->traffic_mutex.unlock();
 					break;
 				}
-				traffic_mutex.unlock();
+			//	game->traffic_mutex.unlock();
 				game->getFrog()->moveLeft();
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			}
 
 		}
@@ -323,29 +326,30 @@ void Update_Frog()
 
 					break;
 				}
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			
 			}
 			else
 			{
-				traffic_mutex.lock();
+				//game->traffic_mutex.lock();
 				if (!game->moveOnLog(1))
 				{
 					game->setEndOfGame(true); //missed the log
+			//		game->traffic_mutex.unlock();
 					break;
 				}
-				traffic_mutex.unlock();
+				//game->traffic_mutex.unlock();
 
 				game->getFrog()->moveRight();
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			}
 
 
@@ -360,42 +364,46 @@ void Update_Frog()
 				game->setEndOfGame(game->detectUpCollision());
 				if (game->did_game_end())
 				{
-					frog_mutex.unlock();
-					endOfGame_mutex.unlock();
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
-					endOfGame_mutex.lock();
-					frog_mutex.lock();
+					game->endOfGame_mutex.lock();
+					game->frog_mutex.lock();
 
 					game->setEndOfGame(true);
 					break;
 				}
 				game->getFrog()->decrementLane();
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			}
 
 			//detect movement of frog onto logs
 			else
 			{
-				traffic_mutex.lock();
+				//game->traffic_mutex.lock();
 				if (game->jumpOnLog() == -1)
 				{
+				//	game->traffic_mutex.unlock();
+					game->endOfGame_mutex.lock();
 					game->setEndOfGame(true); //missed the log
+					game->endOfGame_mutex.unlock();
 					break;
 				}
-				traffic_mutex.unlock();
+			//	game->traffic_mutex.unlock();
 				game->getFrog()->decrementLane();
 				onLog = true;
 				
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(250));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
+
 			}
 
 		}
@@ -410,61 +418,82 @@ void Update_Frog()
 				game->setEndOfGame(game->detectBottomCollision());
 				if (game->did_game_end())
 				{
-					frog_mutex.unlock();
-					endOfGame_mutex.unlock();
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
-					endOfGame_mutex.lock();
-					frog_mutex.lock();
+					game->endOfGame_mutex.lock();
+					game->frog_mutex.lock();
 
 					game->setEndOfGame(true);
 					break;
 				}
 				game->getFrog()->incrementLane();
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			}
 
 			//detect movement of frog onto logs
 			else
 			{
-				traffic_mutex.lock();
+			//	game->traffic_mutex.lock();
 				if (game->jumpOffLog() == -1)
 				{
+			//		game->traffic_mutex.unlock();
 					game->setEndOfGame(true); //missed the log
 					break;
 				}
-				traffic_mutex.unlock();
+			//	game->traffic_mutex.unlock();
 				game->getFrog()->incrementLane();
 				onLog = true;
 
-				frog_mutex.unlock();
-				endOfGame_mutex.unlock();
+				game->frog_mutex.unlock();
+				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				endOfGame_mutex.lock();
-				frog_mutex.lock();
+				game->endOfGame_mutex.lock();
+				game->frog_mutex.lock();
 			}
 
 		}
 		//if (!movedHoriz && game->detectTrafficCollision())
 		if(0)
 		{
-			frog_mutex.unlock();
-			endOfGame_mutex.unlock();
+			game->frog_mutex.unlock();
+			game->endOfGame_mutex.unlock();
 			std::this_thread::sleep_for(std::chrono::milliseconds(200));
-			endOfGame_mutex.lock();
-				game->setEndOfGame(true);
-			frog_mutex.lock();		
+			game->endOfGame_mutex.lock();
+			
+			game->setEndOfGame(true);
+			game->frog_mutex.lock();		
 			break;
 		}
+
+		//update position of frog 
+		/*
+		if ( game->getFrog()->getLane() <= NUMBER_OF_LANES/2 && onLog)
+		{
+			//move frog horizontally
+			float deltaTime = game->clocks[NUMBER_OF_LANES][0].restart().asMilliseconds();
+			int lane = game->getFrog()->getLane();
+			int col = game->getFrog()->getLogLane();
+			float speed = (game->getTraffic().getLogTraffic()->at(lane).at(col)->getSpeed());
+			float deltaX = speed*deltaTime / 100;
+			game->getFrog()->getShape()->move(deltaX, 0);
+
+		}
+		else
+		{
+			game->clocks[NUMBER_OF_LANES][0].restart();
+		}
+		*/
 		movedHoriz = false;
 
-		frog_mutex.unlock();
+		game->frog_mutex.unlock();
 
-		endOfGame_mutex.unlock();
+		game->endOfGame_mutex.unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}

@@ -9,6 +9,7 @@ Frog::Frog()
 	shape->setPosition(WINDOW_MAX_X / 2, WINDOW_MAX_Y - FROG_SIZE);
 	lane = NUMBER_OF_LANES;
 	speed = 0; //no speed at first
+	logLane = -1;
 }
 
 sf::RectangleShape* Frog::getShape()

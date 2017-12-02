@@ -215,6 +215,7 @@ int Game::jumpOnLog()
 			frog->setLogLane(j);
 			return j;
 		}
+
 	}
 	return -1;
 }

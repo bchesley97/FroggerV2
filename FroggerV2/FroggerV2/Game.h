@@ -7,6 +7,7 @@
 #include <vector>
 #include "Frog.h"
 #include "Traffic.h"
+#include <mutex>
 /***************** Helper functions **********************/
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
 
@@ -56,6 +57,18 @@ public:
 	int Game::jumpOnLog();
 	bool Game::moveOnLog(bool right);
 	int Game::jumpOffLog();
+
+
+	//mutexes, currently public IMPLEMENT ENCAPSULATION LATER
+	std::mutex traffic_mutex; //mutex semaphore for traffic array 
+
+	std::mutex frog_mutex; //mutex semaphore for frog (might need)
+
+	std::mutex endOfGame_mutex;
+
+	std::mutex window_mutex;
+
+	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 
 
 };
