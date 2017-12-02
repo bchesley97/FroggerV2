@@ -51,7 +51,7 @@ defines for traffic
 
 #define NUMBER_OF_LILLIES (WINDOW_MAX_X/(2*FROG_SIZE))
 #define LILY_PAD_LENGTH (FROG_SIZE)
-#define LILY_PAD_WIDTH (FROG_SIZE + 10) //ten is "wiggle room" on each side to land on
+#define LILY_PAD_WIDTH (FROG_SIZE) //ten is "wiggle room" on each side to land on
 
 
 

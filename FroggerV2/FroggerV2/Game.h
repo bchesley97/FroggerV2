@@ -24,6 +24,7 @@ private:
 	bool endOfGame;
 	int difficulty;
 
+	bool win;
 	//rectangles for the arena
 	sf::RectangleShape *road;
 	sf::RectangleShape *water;
@@ -41,6 +42,7 @@ public:
 	bool did_game_end();
 	void setEndOfGame(bool endOfGame);
 
+	bool getWin();
 	sf::RenderWindow* getWindow();
 
 	std::vector<sf::RectangleShape> *getLillies();
@@ -58,6 +60,7 @@ public:
 	bool Game::moveOnLog(bool right);
 	int Game::jumpOffLog();
 
+	bool Game::jumpOnLilly();
 
 	//mutexes, currently public IMPLEMENT ENCAPSULATION LATER
 	std::mutex traffic_mutex; //mutex semaphore for traffic array 

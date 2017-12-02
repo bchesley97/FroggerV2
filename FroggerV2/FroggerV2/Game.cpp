@@ -28,7 +28,7 @@ Game::Game()
 		lillies.at(i).setPosition(i * 2 * LILY_PAD_WIDTH, 0); //at top of arena
 	}
 
-
+	win = false;
 					   //create window
 	window = new sf::RenderWindow(	sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
 									"Frogger",
@@ -79,6 +79,10 @@ void Game::updateScreen()
 		this->window->draw(lillies.at(i));
 	}
 
+}
+bool Game::getWin()
+{
+	return win;
 }
 
 
@@ -223,7 +227,7 @@ int Game::jumpOnLog()
 int Game::jumpOffLog()
 {
 	int newLane = frog->getLane() + 1;
-	if (newLane > (int)(NUMBER_OF_LANES / 2))
+	if (newLane >= (int)(NUMBER_OF_LANES / 2))
 	{
 		return true; //jump back to land is always valid
 	}
@@ -277,3 +281,28 @@ bool Game::moveOnLog(bool right)
 
 
 }
+
+
+bool Game::jumpOnLilly()
+{
+	int wiggleRoom = 1.5 * FROG_SIZE;
+
+
+	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
+	{
+		if (lillies.at(i).getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x
+			&& lillies.at(i).getPosition().x + lillies.at(i).getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE)
+		{
+			win = true; 
+
+			frog->getShape()->setPosition(lillies.at(i).getPosition().x, 0);
+			return true; //game has been won
+		}
+
+	}
+
+	win = false;
+	return false;
+
+}
+
