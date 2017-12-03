@@ -115,6 +115,23 @@ void Game::incrementNumFrogsOnLillies()
 
 void Game::setDifficultyOfTraffic()
 {
+
+	if (difficulty = 1)
+	{
+		difficulty = 0;
+		//easy
+	}
+	else if (difficulty = 2)
+	{
+		difficulty = 2;
+		//medium
+	}
+	else
+	{
+		//hard
+		difficulty = 5;
+	}
+
 	for (int i = 0; i < NUMBER_OF_LANES / 2; i++)
 	{
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
@@ -184,7 +201,6 @@ bool Game::detectLeftCollision()
 
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			//frog->decrementLives();
 			return true;
 		}
 
@@ -210,8 +226,6 @@ bool Game::detectRightCollision()
 
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			//frog->decrementLives();
-
 			return true;
 		}
 
@@ -234,8 +248,6 @@ bool Game::detectUpCollision()
 	
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			//frog->decrementLives();
-
 			return true;
 		}
 
@@ -255,8 +267,6 @@ bool Game::detectBottomCollision()
 	{
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			//frog->decrementLives();
-
 			return true;
 		}
 
@@ -278,7 +288,6 @@ bool Game::detectTrafficCollision()
 	{
 		if (intersects(*frog->getShape(), *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			//frog->decrementLives();
 			return true;
 
 		}
@@ -303,7 +312,6 @@ int Game::jumpOnLog()
 		}
 
 	}
-	//frog->decrementLives();
 
 	return -1;
 }
@@ -326,7 +334,6 @@ int Game::jumpOffLog()
 			return j;
 		}
 	}
-	//frog->decrementLives();
 
 	return -1;
 }
@@ -344,13 +351,12 @@ bool Game::moveOnLog(bool right)
 	{
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 		{
-			if (traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x + frog->getHorizJump()
-				&& traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x + traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE + frog->getHorizJump())
+			if (traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x 
+				&& traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x + traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE )
 			{
 				return true;
 			}
 		}
-		//frog->decrementLives();
 
 		return false;
 	}
@@ -358,13 +364,12 @@ bool Game::moveOnLog(bool right)
 	{
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 		{
-			if (traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x - frog->getHorizJump()
-				&& traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x + traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE - frog->getHorizJump())
+			if (traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x
+				&& traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getPosition().x + traffic.getLogTraffic()->at(newLane).at(j)->getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE )
 			{
 				return true;
 			}
 		}
-		//frog->decrementLives();
 
 		return false;
 	}
@@ -382,17 +387,15 @@ bool Game::jumpOnLilly()
 		if (lillies.at(i).getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x
 			&& lillies.at(i).getShape()->getPosition().x + lillies.at(i).getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE)
 		{
-			//win = true;
-			//frog->getShape()->setPosition(lillies.at(i).getShape()->getPosition().x, 0);
 
 			if (lillies.at(i).getFrogOn())
 			{
-				//frog->decrementLives();
 				return false; //there is already a frog on this lilly, decrement number of lives 
 			}
 
 			lillies.at(i).frogOnLilly(); //set color to green and change boolean variable
 			++numFrogsOnLillies;
+
 			//check if game is over
 			if (numFrogsOnLillies == NUMBER_OF_LILLIES)
 			{
@@ -404,8 +407,6 @@ bool Game::jumpOnLilly()
 		}
 
 	}
-	//frog->decrementLives();
-	//win = false;
 	return false;
 
 }

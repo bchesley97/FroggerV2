@@ -31,6 +31,7 @@ int main() {
 	livesText->setOrigin(0, 0);
 	livesText->setPosition(10, LIVES_TEXT_PLACEMENT_Y);
 	livesText->setFillColor(sf::Color::Black);
+
 	/**************** initializations before start multithreaded application ******************/
 	std::thread startGame(StartGameThread);
 
@@ -45,10 +46,12 @@ int main() {
 
 
 void StartGameThread() {
+	
 
 		int difficulty = 2;
 		//initialize traffic array
 		game = new Game();
+		game->setDifficulty(2); //default difficulty
 
 		game->printWelcomeMenu();
 		game->printDifficultyMenu();
@@ -137,6 +140,7 @@ void Draw_All_Objects() {
 
 	game->getWindow()->setActive(true);
 	game->getWindow()->setFramerateLimit(100); //60 fps
+
 
 	sf::Text timeText;
 
@@ -396,13 +400,10 @@ void Update_Frog()
 			{
 				game->getFrog()->moveLeft();
 
-				//game->setEndOfGame(game->detectRightCollision());
 				if (game->detectLeftCollision())
 				{
 					std::this_thread::sleep_for(std::chrono::milliseconds(50));
-				//	livesText->setString("Lives: " + std::to_string(game->getFrog()->getLives()));
 					game->frogDied();
-				//	game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
 					continue;
@@ -418,22 +419,19 @@ void Update_Frog()
 			}
 			else
 			{
+				game->getFrog()->moveLeft();
+
 				if (!game->moveOnLog(0))
 				{
-					//game->setEndOfGame(true); //missed the log
-				//	game->traffic_mutex.unlock();
+					//if jumped off of log
 					game->frogDied();
 
-				//	game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
-				//	livesText->setString("Lives: "+std::to_string(game->getFrog()->getLives()));
 					continue;
 
-
-				//break;
 				}
-				game->getFrog()->moveLeft();
+			//	game->getFrog()->moveLeft();
 
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
@@ -468,6 +466,8 @@ void Update_Frog()
 			}
 			else
 			{
+				game->getFrog()->moveRight();
+
 				if (!game->moveOnLog(1))
 				{
 					game->frogDied();
@@ -477,7 +477,7 @@ void Update_Frog()
 					continue;
 				}
 
-				game->getFrog()->moveRight();
+				//game->getFrog()->moveRight();
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
 				std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -499,9 +499,16 @@ void Update_Frog()
 					game->endOfGame_mutex.unlock();
 					std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
 
-					game->getFrog()->reset();
+					if (game->getNumFrogsOnLillies() == NUMBER_OF_LILLIES)
+					{
+						break; //game is over
+					}
+					else
+					{
+						game->getFrog()->reset();
+						continue;
+					}
 
-					continue;
 				}
 
 				else
