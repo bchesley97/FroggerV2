@@ -42,6 +42,12 @@
     <ClCompile Include="Traffic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Menus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lillies.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h">
@@ -64,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="Traffic.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lillies.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

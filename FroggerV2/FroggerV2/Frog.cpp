@@ -6,10 +6,11 @@ Frog::Frog()
 {
 	shape = new sf::RectangleShape(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	shape->setFillColor(sf::Color::Green); //frogs are usually green
-	shape->setPosition(WINDOW_MAX_X / 2, WINDOW_MAX_Y - FROG_SIZE);
+	shape->setPosition(WINDOW_MAX_X / 2, NUMBER_OF_LANES*(FROG_SIZE) + FROG_SIZE);
 	lane = NUMBER_OF_LANES;
 	speed = 0; //no speed at first
 	logLane = -1;
+	lives = 3; //three lives 
 }
 
 sf::RectangleShape* Frog::getShape()
@@ -66,4 +67,19 @@ void Frog::moveUp()
 void Frog::moveDown()
 {
 	shape->move(0, VEHICLE_LENGTH);
+}
+void Frog::decrementLives()
+{
+	--lives;
+}
+int Frog::getLives() 
+{
+	return lives;
+}
+void Frog::reset()
+{
+	shape->setPosition(WINDOW_MAX_X / 2, NUMBER_OF_LANES*(FROG_SIZE)+FROG_SIZE); //reset frog
+	lane = NUMBER_OF_LANES;
+	speed = 0; //no speed at first
+	logLane = -1;
 }

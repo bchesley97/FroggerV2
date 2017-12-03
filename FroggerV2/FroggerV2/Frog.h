@@ -14,6 +14,7 @@ private:
 	int lane;
 	int speed; //this variable is only if the frog has jumped on a log
 	int logLane;
+	int lives;
 
 public:
 
@@ -29,6 +30,9 @@ public:
 	void Frog::incrementLane();
 	void Frog::decrementLane();
 
+	void decrementLives();
+	int getLives();
+	void reset();
 	void moveLeft();
 	void moveRight();
 	void moveUp();

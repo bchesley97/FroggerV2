@@ -23,16 +23,16 @@ Game::Game()
 	//create lillies (land on to win game)
 	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
 	{
-		lillies.push_back(*new sf::RectangleShape(sf::Vector2f(LILY_PAD_WIDTH, LILY_PAD_LENGTH)));
-		lillies.at(i).setFillColor(sf::Color(102, 238, 148,255)); //some kind of light green
-		lillies.at(i).setPosition(i * 2 * LILY_PAD_WIDTH, 0); //at top of arena
+		lillies.push_back(*new Lilly());
+		lillies.at(i).getShape()->setPosition(i * 2 * LILY_PAD_WIDTH, 0); //at top of arena
 	}
 
 	win = false;
-					   //create window
+	/*				   //create window
 	window = new sf::RenderWindow(	sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
 									"Frogger",
 									sf::Style::Default);
+	*/
 }
 
 
@@ -41,7 +41,12 @@ sf::RenderWindow* Game::getWindow()
 	return window;
 }
 
-
+void Game::createWindow()
+{
+	window = new sf::RenderWindow(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
+		"Frogger",
+		sf::Style::Default);
+}
 
 Traffic Game::getTraffic()
 {
@@ -63,7 +68,24 @@ void Game::setEndOfGame(bool endOfGame)
 	this->endOfGame = endOfGame;
 }
 
-std::vector<sf::RectangleShape> *Game:: getLillies()
+float Game::getTime()
+{
+	return time;
+}
+
+void Game::setTime(float time)
+{
+	this->time = time;
+}
+void Game::setDifficulty(int difficulty)
+{
+	this->difficulty = difficulty;
+}
+int Game::getDifficulty()
+{
+	return difficulty;
+}
+std::vector<Lilly> *Game:: getLillies()
 {
 	return &lillies;
 }
@@ -76,7 +98,7 @@ void Game::updateScreen()
 	
 	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
 	{
-		this->window->draw(lillies.at(i));
+		this->window->draw(*lillies.at(i).getShape());
 	}
 
 }
@@ -84,8 +106,31 @@ bool Game::getWin()
 {
 	return win;
 }
+int Game::getNumFrogsOnLillies()
+{
+	return numFrogsOnLillies;
+}
+void Game::incrementNumFrogsOnLillies()
+{
+	++numFrogsOnLillies;
+}
+void Game::restartArena()
+{
+	frog = new Frog(); //create new frog 
 
 
+	traffic_mutex.try_lock();
+	frog_mutex.try_lock();
+	endOfGame_mutex.try_lock();
+	window_mutex.try_lock();
+
+	traffic_mutex.unlock();
+	frog_mutex.unlock();
+	endOfGame_mutex.unlock();
+	window_mutex.unlock();
+
+
+}
 //helper function to detect intersections between traffic and frog
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
 {
@@ -113,6 +158,7 @@ bool Game::detectLeftCollision()
 
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
+			frog->decrementLives();
 			return true;
 		}
 
@@ -138,6 +184,8 @@ bool Game::detectRightCollision()
 
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
+			frog->decrementLives();
+
 			return true;
 		}
 
@@ -160,6 +208,8 @@ bool Game::detectUpCollision()
 	
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
+			frog->decrementLives();
+
 			return true;
 		}
 
@@ -179,6 +229,8 @@ bool Game::detectBottomCollision()
 	{
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
+			frog->decrementLives();
+
 			return true;
 		}
 
@@ -199,7 +251,11 @@ bool Game::detectTrafficCollision()
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 		if (intersects(*frog->getShape(), *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
+		{
+			frog->decrementLives();
 			return true;
+
+		}
 	}
 
 	return false;
@@ -221,6 +277,8 @@ int Game::jumpOnLog()
 		}
 
 	}
+	frog->decrementLives();
+
 	return -1;
 }
 
@@ -242,6 +300,8 @@ int Game::jumpOffLog()
 			return j;
 		}
 	}
+	frog->decrementLives();
+
 	return -1;
 }
 
@@ -264,6 +324,8 @@ bool Game::moveOnLog(bool right)
 				return true;
 			}
 		}
+		frog->decrementLives();
+
 		return false;
 	}
 	else 
@@ -276,6 +338,8 @@ bool Game::moveOnLog(bool right)
 				return true;
 			}
 		}
+		frog->decrementLives();
+
 		return false;
 	}
 
@@ -285,24 +349,31 @@ bool Game::moveOnLog(bool right)
 
 bool Game::jumpOnLilly()
 {
-	int wiggleRoom = 1.5 * FROG_SIZE;
+	int wiggleRoom =  FROG_SIZE/4;
 
 
 	for (int i = 0; i < NUMBER_OF_LILLIES; i++)
 	{
-		if (lillies.at(i).getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x
-			&& lillies.at(i).getPosition().x + lillies.at(i).getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE)
+		if (lillies.at(i).getShape()->getPosition().x - wiggleRoom <= frog->getShape()->getPosition().x
+			&& lillies.at(i).getShape()->getPosition().x + lillies.at(i).getShape()->getSize().x + wiggleRoom >= frog->getShape()->getPosition().x + FROG_SIZE)
 		{
-			win = true; 
+			//win = true;
+			//frog->getShape()->setPosition(lillies.at(i).getShape()->getPosition().x, 0);
+			lillies.at(i).getShape()->setFillColor(sf::Color::Green);
 
-			frog->getShape()->setPosition(lillies.at(i).getPosition().x, 0);
+			//check if game is over
+			if (numFrogsOnLillies == NUMBER_OF_LILLIES)
+			{
+				endOfGame = true;
+				win = true; //won the game if all frogs on lillies
+
+			}
 			return true; //game has been won
 		}
 
 	}
-
+	frog->decrementLives();
 	win = false;
 	return false;
 
 }
-

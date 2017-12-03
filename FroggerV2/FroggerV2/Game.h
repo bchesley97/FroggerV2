@@ -8,6 +8,7 @@
 #include "Frog.h"
 #include "Traffic.h"
 #include <mutex>
+#include "Lillies.h"
 /***************** Helper functions **********************/
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2);
 
@@ -25,12 +26,15 @@ private:
 	int difficulty;
 
 	bool win;
+
+	int numFrogsOnLillies;
 	//rectangles for the arena
 	sf::RectangleShape *road;
 	sf::RectangleShape *water;
 	
-	std::vector<sf::RectangleShape> lillies;
+	std::vector<Lilly> lillies;
 
+	float time;
 
 public:
 	Game();
@@ -38,6 +42,7 @@ public:
 	Traffic getTraffic();
 
 	Frog* Game::getFrog();
+	void Game::createWindow();
 
 	bool did_game_end();
 	void setEndOfGame(bool endOfGame);
@@ -45,10 +50,18 @@ public:
 	bool getWin();
 	sf::RenderWindow* getWindow();
 
-	std::vector<sf::RectangleShape> *getLillies();
+	void setDifficulty(int difficulty);
+	int getDifficulty();
+	std::vector<Lilly> *Game::getLillies();
 
 	void Game::updateScreen();
 
+	void Game::printWelcomeMenu();
+	void Game::printDifficultyMenu();
+	int getNumFrogsOnLillies();
+	void incrementNumFrogsOnLillies();
+
+	void Game::restartArena();
 	//collision detection
 	bool detectLeftCollision();
 	bool detectRightCollision();
@@ -73,6 +86,8 @@ public:
 
 	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 
+	float getTime();
+	void Game::setTime(float time);
 
 };
 

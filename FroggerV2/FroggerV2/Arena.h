@@ -58,6 +58,8 @@ defines for traffic
 #define LOG_LENGTH (FROG_SIZE)
 #define MIN_LOG_WIDTH (FROG_SIZE*3)
 
+#define CHAR_SIZE (20)
+#define TIME_TEXT_PLACEMENT_Y (WINDOW_MAX_Y - CHAR_SIZE)
 
 /************************* Data Structures *************************/
 
