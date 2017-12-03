@@ -21,6 +21,8 @@ private:
 
 	Traffic traffic;
 	sf::RenderWindow *window;
+	sf::Text *livesText;
+	bool frogDead;
 
 	bool endOfGame;
 	int difficulty;
@@ -47,6 +49,10 @@ public:
 	bool did_game_end();
 	void setEndOfGame(bool endOfGame);
 
+	void frogDied();
+	bool didFrogDie();
+	void Game::newFrog();
+
 	bool getWin();
 	sf::RenderWindow* getWindow();
 
@@ -55,13 +61,13 @@ public:
 	std::vector<Lilly> *Game::getLillies();
 
 	void Game::updateScreen();
-
+	
 	void Game::printWelcomeMenu();
 	void Game::printDifficultyMenu();
 	int getNumFrogsOnLillies();
 	void incrementNumFrogsOnLillies();
+	void setDifficultyOfTraffic();
 
-	void Game::restartArena();
 	//collision detection
 	bool detectLeftCollision();
 	bool detectRightCollision();
@@ -72,6 +78,9 @@ public:
 	int Game::jumpOnLog();
 	bool Game::moveOnLog(bool right);
 	int Game::jumpOffLog();
+	
+	int Game::printLoserScreen();
+	int Game::printWinnerScreen();
 
 	bool Game::jumpOnLilly();
 
@@ -83,6 +92,8 @@ public:
 	std::mutex endOfGame_mutex;
 
 	std::mutex window_mutex;
+
+	std::mutex dead_frog_mutex;
 
 	sf::Clock clocks[NUMBER_OF_LANES][MAX_NUMBER_OF_VEHICLES];
 

@@ -16,25 +16,25 @@ void Update_Traffic();
 
 void Update_Frog();
 
-void End_Game();
+void frogDiedTransition();
 /**************************** Global Variables *******************************/
 
 Game *game;
-
+sf::Text *livesText;
 /******************************** semaphores *********************************/
-
 
 int main() {
 
+	sf::Font font;
+	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
+	livesText = new sf::Text("Lives: 3", font, CHAR_SIZE);
+	livesText->setOrigin(0, 0);
+	livesText->setPosition(10, LIVES_TEXT_PLACEMENT_Y);
+	livesText->setFillColor(sf::Color::Black);
 	/**************** initializations before start multithreaded application ******************/
-
-	//std::thread testThread(thread1 );
-
 	std::thread startGame(StartGameThread);
 
 	startGame.join(); //to have main not run as a thread 
-					  //	return 0;
-
 
 	//if game got here, means game is over and need to restart
 	std::thread newStartGame(StartGameThread);
@@ -46,38 +46,84 @@ int main() {
 
 void StartGameThread() {
 
-	//DO INITIALIZATIONS HERE 	
-	
-	//game->printWelcomeMenu();
-	//game->printDifficultyMenu();
-
-	//	updateThread.join();
-
+		int difficulty = 2;
 		//initialize traffic array
 		game = new Game();
 
 		game->printWelcomeMenu();
-		//game->printDifficultyMenu();
+		game->printDifficultyMenu();
+		game->setDifficultyOfTraffic(); //update the difficulty that the player chose
+
+		game = new Game();
 
 		game->createWindow();
-	while (1)
-	{
 		game->getWindow()->setActive(false);
-	std::thread drawThread(Draw_All_Objects);
-	std::thread updateThread(Update_Traffic);
-	std::thread frogThread(Update_Frog);
+		game->setDifficultyOfTraffic();
 
-		//currently play game forever
+		std::thread drawThread(Draw_All_Objects);
+		std::thread updateThread(Update_Traffic);
+		std::thread frogThread(Update_Frog);
+
 		drawThread.join();
 		updateThread.join();
 		frogThread.join();
-		//std::thread testDraw(Debug_Draw);
-		//testDraw.join();
-
-		std::thread endGame(End_Game);
-		endGame.join();
 	
-		game->restartArena();
+	while (1)
+	{
+
+		int choice;
+		//game has ended, display appropriate menu's
+		if (game->getWin())
+		{
+			//game was won, display menu
+			choice = game->printWinnerScreen();
+		}
+		else
+		{
+			//game was lost
+			choice = game->printLoserScreen();
+		}
+
+		if (choice == 1)
+		{ 
+			//menu
+			game = new Game();
+
+			game->printDifficultyMenu();
+			game->setDifficultyOfTraffic(); //update the difficulty that the player chose
+			difficulty = game->getDifficulty();
+			game = new Game();
+			game->createWindow();
+			game->getWindow()->setActive(false);
+			livesText->setString("Lives: 3");
+
+			std::thread drawThread(Draw_All_Objects);
+			std::thread updateThread(Update_Traffic);
+			std::thread frogThread(Update_Frog);
+			drawThread.join();
+			updateThread.join();
+			frogThread.join();
+		}
+		else if (choice == 2)
+		{//replay
+			game = new Game();
+			game->createWindow();
+			game->getWindow()->setActive(false);
+			livesText->setString("Lives: 3");
+
+			game->setDifficultyOfTraffic();
+			std::thread drawThread(Draw_All_Objects);
+			std::thread updateThread(Update_Traffic);
+			std::thread frogThread(Update_Frog);
+			drawThread.join();
+			updateThread.join();
+			frogThread.join();
+		}
+		else if (choice == 3)
+		{//exit program
+			break;
+		}
+
 	}
 }
 
@@ -95,67 +141,104 @@ void Draw_All_Objects() {
 	sf::Text timeText;
 
 	game->window_mutex.lock();
+	int fade = game->getFrog()->getShape()->getFillColor().a;
+	sf::Color newColor = game->getFrog()->getShape()->getFillColor();
 	while (game->getWindow()->isOpen()) {
 		
 		game->window_mutex.unlock();
 		
 		sf::Event event;
 		game->window_mutex.lock();
+		game->getWindow()->setActive(true);
 		while (game->getWindow()->pollEvent(event)) {
 			if (event.type == sf::Event::Closed)
 			{
 				game->getWindow()->close();
 			}
 		}
+		game->window_mutex.unlock();
 
 		game->updateScreen();
-		game->window_mutex.unlock();
+		//game->window_mutex.unlock();
 		for (int i = 0; i < NUMBER_OF_LANES/2; i++)
 		{
 			for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 			{
+				game->window_mutex.lock();
+
 				game->traffic_mutex.lock();
 				//sf::RectangleShape rect = ((*game->getTraffic())[i][j]->getShape());
 				std::vector< Vehicle *> Vehicles = game->getTraffic().getRoadTraffic()->at(i);
 				Vehicle *specificVehicle = Vehicles.at(j);
 				sf::RectangleShape rectangle = *specificVehicle->getShape();
 
-				game->window_mutex.lock();
+				//game->window_mutex.lock();
 				game->getWindow()->draw(rectangle); //draw all the traffic 
 				game->getWindow()->draw(*game->getTraffic().getLogTraffic()->at(i).at(j)->getShape());
 				
-				game->window_mutex.unlock();
 				
 				game->traffic_mutex.unlock(); //release semaphore
+
+				game->window_mutex.unlock();
+
 			}
 		}
+		game->window_mutex.lock();
+
+			//	game->window_mutex.unlock();
 
 		//draw frog
-		game->window_mutex.lock();
+		//game->window_mutex.lock();
 		game->frog_mutex.lock();
 		game->getWindow()->draw(*game->getFrog()->getShape());
 		game->frog_mutex.unlock();
 
-
+		game->getWindow()->draw(*livesText);
 		game->getWindow()->display();
-	//	game->window_mutex.unlock();
 
+		game->window_mutex.unlock();
+		if (game->didFrogDie())
+		{
+
+			if (fade >= 0)
+			{
+				game->frog_mutex.lock();
+				newColor.a = newColor.a - 20;
+				game->getFrog()->getShape()->setFillColor(newColor);
+				game->getWindow()->draw(*game->getFrog()->getShape());
+				game->getWindow()->draw(*livesText);
+				fade = fade - 20;
+				game->frog_mutex.unlock();
+			}
+			else
+			{
+				fade = game->getFrog()->getShape()->getFillColor().a;
+
+				game->frog_mutex.lock();
+				game->getFrog()->decrementLives();
+				livesText->setString("Lives: " + std::to_string(game->getFrog()->getLives()));
+				game->newFrog();
+				game->getFrog()->reset();
+				game->frog_mutex.unlock();
+			}
+		}
 		if (game->did_game_end())
 		{
-			//game->getWindow()->draw(*game->getFrog()->getShape());
-			//game->getWindow()->setActive(false);
-			//break;
+			break;
 		}
 
 		
 
-		game->window_mutex.unlock();
+		//game->window_mutex.unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
 		game->window_mutex.lock();
+		game->getWindow()->setActive(true);
+
 	}
-	game->window_mutex.unlock();
+
+	//game->window_mutex.unlock();
 }
 
 //update position of cars 
@@ -245,9 +328,7 @@ void Update_Traffic() {
 				}
 				else
 				{
-					
 					log->getShape()->move(log->getSpeed() * delta_time / 100, 0);
-					
 				}
 
 				//wait about 1.4 seconds before respawning vehicle
@@ -276,9 +357,7 @@ void Update_Traffic() {
 
 		if (game->did_game_end())
 		{
-
-
-			//break;
+			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(60)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
 	}
@@ -294,6 +373,20 @@ void Update_Frog()
 
 	while (1)
 	{
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(60)); //NEEDS TO SLEEP LONGER THAN THE DRAW THREAD
+
+		if (game->didFrogDie())
+		{
+			while (game->didFrogDie()); //wait in this thread if frog is dead
+		}
+
+		if (game->getFrog()->getLives() <= 0)
+		{
+			game->setEndOfGame(true);
+			break; //game over, no  more lives 
+		}
+
 		game->endOfGame_mutex.lock();
 		game->frog_mutex.lock();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
@@ -303,12 +396,13 @@ void Update_Frog()
 			{
 				game->getFrog()->moveLeft();
 
-				game->setEndOfGame(game->detectRightCollision());
-				if (game->did_game_end())
+				//game->setEndOfGame(game->detectRightCollision());
+				if (game->detectLeftCollision())
 				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-					game->getFrog()->reset();
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
+				//	livesText->setString("Lives: " + std::to_string(game->getFrog()->getLives()));
+					game->frogDied();
+				//	game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
 					continue;
@@ -317,7 +411,7 @@ void Update_Frog()
 				}
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			
@@ -328,9 +422,12 @@ void Update_Frog()
 				{
 					//game->setEndOfGame(true); //missed the log
 				//	game->traffic_mutex.unlock();
-					game->getFrog()->reset();
+					game->frogDied();
+
+				//	game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
+				//	livesText->setString("Lives: "+std::to_string(game->getFrog()->getLives()));
 					continue;
 
 
@@ -340,7 +437,7 @@ void Update_Frog()
 
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			}
@@ -353,20 +450,18 @@ void Update_Frog()
 			{
 				game->getFrog()->moveRight();
 
-				game->setEndOfGame(game->detectRightCollision());
-				if (game->did_game_end())
+				if (game->detectRightCollision())
 				{
-					game->getFrog()->reset();
+					game->frogDied();
+
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 					continue;
-
-
-					//break;
 				}
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			
@@ -375,16 +470,17 @@ void Update_Frog()
 			{
 				if (!game->moveOnLog(1))
 				{
-				//	game->setEndOfGame(true); //missed the log
-					game->getFrog()->reset();
+					game->frogDied();
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
 
-					//break;
+					continue;
 				}
 
 				game->getFrog()->moveRight();
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			}
@@ -393,49 +489,55 @@ void Update_Frog()
 		}
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 		{
-
 			game->getFrog()->moveUp();
 
 			if (game->getFrog()->getLane() == 0)
 			{
-				game->jumpOnLilly();
-			//	game->setEndOfGame(true);
-						
-				game->getFrog()->reset();
-				game->frog_mutex.unlock();
-				game->endOfGame_mutex.unlock();
-				continue;
+				if (game->jumpOnLilly())
+				{
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
+					std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
 
+					game->getFrog()->reset();
 
-				//break;
-				
+					continue;
+				}
+
+				else
+				{
+					game->frogDied();
+
+					//missed the lilly
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
+					continue;
+
+				}
 
 			}
 			else if (game->getFrog()->getLane() > (int)(NUMBER_OF_LANES / 2))
 			{
 
-				game->setEndOfGame(game->detectUpCollision());
-				if (game->did_game_end())
+				if (game->detectUpCollision())
 				{
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 					game->endOfGame_mutex.lock();
 					game->frog_mutex.lock();
+					game->frogDied();
 
-				//	game->setEndOfGame(true);
-					game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
 					continue;
 
-					//break;
 				}
 
 				game->getFrog()->decrementLane();
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
@@ -446,23 +548,17 @@ void Update_Frog()
 			{
 				if (game->jumpOnLog() == -1)
 				{
-				game->endOfGame_mutex.lock();
-				//	game->setEndOfGame(true); //missed the log
-				game->endOfGame_mutex.unlock();
-				game->getFrog()->reset();
-				game->frog_mutex.unlock();
-				game->endOfGame_mutex.unlock();
-				continue;
-
-
-				//					break;
+					game->frogDied();
+					game->frog_mutex.unlock();
+					game->endOfGame_mutex.unlock();
+					continue;
 				}
 				game->getFrog()->decrementLane();
 				onLog = true;
 
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			}
@@ -481,10 +577,9 @@ void Update_Frog()
 					game->getFrog()->incrementLane();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-					game->endOfGame_mutex.lock();
-					game->frog_mutex.lock();
+					continue;
 				}
 
 				if (game->getFrog()->getLane() == NUMBER_OF_LANES)
@@ -495,28 +590,24 @@ void Update_Frog()
 					continue;
 				}
 
-				game->setEndOfGame(game->detectBottomCollision());
-				if (game->did_game_end())
+				if (game->detectBottomCollision())
 				{
+					game->frogDied();
+
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(50));
 					game->endOfGame_mutex.lock();
 					game->frog_mutex.lock();
 
-					//	game->setEndOfGame(true);
-					game->getFrog()->reset();
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
 					continue;
-
-
-					//break;
 				}
 				game->getFrog()->incrementLane();
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
@@ -527,21 +618,19 @@ void Update_Frog()
 			{
 				if (game->jumpOffLog() == -1)
 				{
-					//	game->setEndOfGame(true); //missed the log					
-					game->getFrog()->reset();
+					game->frogDied();
+
+					//missed log
 					game->frog_mutex.unlock();
 					game->endOfGame_mutex.unlock();
 					continue;
-
-
-					//break;
 				}
 				game->getFrog()->incrementLane();
 				onLog = true;
 
 				game->frog_mutex.unlock();
 				game->endOfGame_mutex.unlock();
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 				game->endOfGame_mutex.lock();
 				game->frog_mutex.lock();
 			}
@@ -549,48 +638,21 @@ void Update_Frog()
 		}
 		if (!movedHoriz && game->detectTrafficCollision())
 		{
-			game->setEndOfGame(true);
-			game->getFrog()->reset();
+			game->frogDied();
 
-			//			break;
 		}
 
 		if (game->getFrog()->getShape()->getPosition().x >= WINDOW_MAX_X || game->getFrog()->getShape()->getPosition().x + FROG_SIZE <= WINDOW_MIN_X)
 		{
-			game->endOfGame_mutex.lock();
-			game->getFrog()->decrementLives();
-			game->endOfGame_mutex.unlock();
-			game->getFrog()->reset();
+			game->frogDied();
 		}
 
-		if (game->getFrog()->getLives() <= 0)
-		{
-			break; //game over, no  more lives 
-		}
-		if (game->did_game_end())
-		{
-			break;
-		}
+
 		movedHoriz = false;
 
 		game->frog_mutex.unlock();
 
 		game->endOfGame_mutex.unlock();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 
-	game->frog_mutex.unlock();
-	game->endOfGame_mutex.unlock();
-
-
 }
-
-//end of game thread, will display menu and redisplay choices
-void End_Game()
-{
-	//game->getWindow()->setActive(true);
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-}
-

@@ -9,7 +9,7 @@ using namespace std;
 void Game::printWelcomeMenu()
 {
 	sf::RenderWindow window(sf::VideoMode(800, 600),
-		"HelloSFML", sf::Style::Default);
+		"Welcome Menu", sf::Style::Default);
 
 	sf::Font font;
 	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
@@ -50,219 +50,78 @@ void Game::printWelcomeMenu()
 		}
 	}
 }
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <string>
-#include <sstream>
 
-using namespace std;
-
-void Game::printDifficultyMenu()
+void Game:: printDifficultyMenu()
 {
+	//Initialize difficulty outside of function
 	int difficulty = 2;
-	sf::RenderWindow window(sf::VideoMode(800, 600),
-		"HelloSFML", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(800, 800),
+		"Difficulty Menu", sf::Style::Default);
 
 	sf::Font font;
 	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
 
-	for (int ii = 1; ii < 5; ii++)
-	{
-		for (int jj = 75; jj < 675; jj = jj + 150)
-		{
-			sf::Text ii;
-			ii.setCharacterSize(30);
-			ii.setOrigin(0, 15);
-			ii.setFont(font);
-			ii.setPosition(200, jj);
-			ii.setFillColor(sf::Color::Black);
-			if (jj = 75)
-				ii.setString("SELECT DIFFICULTY:");
-			else if (jj = 225)
-				ii.setString("EASY");
-			else if (jj = 375)
-				ii.setString("NORMAL");
-			else
-				ii.setString("HARD");
-
-
-			/*sf::Text text2;
-			text2.setCharacterSize(30);
-			text2.setOrigin(0, 15);
-			text2.setFont(font);
-			text2.setPosition(200, 225);
-			text2.setFillColor(sf::Color::Black);
-			text2.setString("EASY");
-
-			sf::Text text3;
-			text3.setCharacterSize(30);
-			text3.setOrigin(0, 15);
-			text3.setFont(font);
-			text3.setPosition(200, 375);
-			text3.setFillColor(sf::Color::Black);
-			text3.setString("NORMAL");
-
-			sf::Text text4;
-			text4.setCharacterSize(30);
-			text4.setOrigin(0, 15);
-			text4.setFont(font);
-			text4.setPosition(200, 525);
-			text4.setFillColor(sf::Color::Black);
-			text4.setString("HARD");*/
-
-			sf::CircleShape circle(20);
-			circle.setOrigin(20, 20);
-			circle.setFillColor(sf::Color(255, 255, 255));
-			circle.setOutlineThickness(-5);
-			circle.setOutlineColor(sf::Color(0, 0, 0));
-			circle.setPosition(100, 375);
-
-			sf::RectangleShape rectangle1(sf::Vector2f(800, 150));
-			rectangle1.setFillColor(sf::Color(255, 255, 255));
-			rectangle1.setOutlineThickness(-20);
-			rectangle1.setOutlineColor(sf::Color(0, 0, 0));
-
-			sf::RectangleShape rectangle2(sf::Vector2f(800, 150));
-			rectangle2.setFillColor(sf::Color(255, 255, 255));
-			rectangle2.setOutlineThickness(-20);
-			rectangle2.setOutlineColor(sf::Color(0, 0, 0));
-			rectangle2.setPosition(0, 150);
-
-			sf::RectangleShape rectangle3(sf::Vector2f(800, 150));
-			rectangle3.setFillColor(sf::Color(255, 255, 255));
-			rectangle3.setOutlineThickness(-20);
-			rectangle3.setOutlineColor(sf::Color(0, 0, 0));
-			rectangle3.setPosition(0, 300);
-
-			sf::RectangleShape rectangle4(sf::Vector2f(800, 150));
-			rectangle4.setFillColor(sf::Color(255, 255, 255));
-			rectangle4.setOutlineThickness(-20);
-			rectangle4.setOutlineColor(sf::Color(0, 0, 0));
-			rectangle4.setPosition(0, 450);
-
-
-			while (window.isOpen())
-			{
-				//Prints difficulty and mode menus
-				//window.clear();
-				window.draw(rectangle1);
-				window.draw(rectangle2);
-				window.draw(rectangle3);
-				window.draw(rectangle4);
-				window.draw(ii);
-				window.draw(circle);
-				window.display();
-				sf::Event event;
-				while (window.pollEvent(event))
-				{
-					if (event.type == sf::Event::Closed)
-					{
-						window.close();
-					}
-					//Changes difficulty
-					else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-					{
-						if (difficulty > 1)
-						{
-							circle.move(0, -150);
-							difficulty -= 1;
-						}
-					}
-					else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-					{
-						if (difficulty < 3)
-						{
-							circle.move(0, 150);
-							difficulty += 1;
-						}
-					}
-					//Closes window
-					else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-					{
-						window.close();
-					}
-				}
-			}
-		}
-	}
-	this->difficulty = difficulty;
-}
-/*
-
-//Prints Mode Menu
-int printModeMenu(int mode)
-{
-	int mode2 = 2;
-	sf::RenderWindow window(sf::VideoMode(800, 600),
-		"HelloSFML", sf::Style::Default);
-
-	sf::Font font;
-	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
-
-	//Prints mode text
 	sf::Text text1;
 	text1.setCharacterSize(30);
 	text1.setOrigin(0, 15);
 	text1.setFont(font);
-	text1.setPosition(200, 75);
+	text1.setPosition(200, 100);
 	text1.setFillColor(sf::Color::Black);
-	text1.setString("SELECT MODE:");
+	text1.setString("SELECT DIFFICULTY:");
 
 	sf::Text text2;
 	text2.setCharacterSize(30);
 	text2.setOrigin(0, 15);
 	text2.setFont(font);
-	text2.setPosition(200, 225);
+	text2.setPosition(200, 300);
 	text2.setFillColor(sf::Color::Black);
-	text2.setString("TIMED");
+	text2.setString("EASY");
 
 	sf::Text text3;
 	text3.setCharacterSize(30);
 	text3.setOrigin(0, 15);
 	text3.setFont(font);
-	text3.setPosition(200, 375);
+	text3.setPosition(200, 500);
 	text3.setFillColor(sf::Color::Black);
-	text3.setString("CLASSIC");
+	text3.setString("NORMAL");
 
 	sf::Text text4;
 	text4.setCharacterSize(30);
 	text4.setOrigin(0, 15);
 	text4.setFont(font);
-	text4.setPosition(200, 525);
+	text4.setPosition(200, 700);
 	text4.setFillColor(sf::Color::Black);
-	text4.setString("INFINITE");
+	text4.setString("HARD");
 
-	//Visual aid for user
 	sf::CircleShape circle(20);
 	circle.setOrigin(20, 20);
 	circle.setFillColor(sf::Color(255, 255, 255));
 	circle.setOutlineThickness(-5);
 	circle.setOutlineColor(sf::Color(0, 0, 0));
-	circle.setPosition(100, 375);
+	circle.setPosition(100, 500);
 
-	//Divides menu into quadrants
-	sf::RectangleShape rectangle1(sf::Vector2f(800, 150));
+	sf::RectangleShape rectangle1(sf::Vector2f(800, 200));
 	rectangle1.setFillColor(sf::Color(255, 255, 255));
 	rectangle1.setOutlineThickness(-20);
 	rectangle1.setOutlineColor(sf::Color(0, 0, 0));
 
-	sf::RectangleShape rectangle2(sf::Vector2f(800, 150));
+	sf::RectangleShape rectangle2(sf::Vector2f(800, 200));
 	rectangle2.setFillColor(sf::Color(255, 255, 255));
 	rectangle2.setOutlineThickness(-20);
 	rectangle2.setOutlineColor(sf::Color(0, 0, 0));
-	rectangle2.setPosition(0, 150);
+	rectangle2.setPosition(0, 200);
 
-	sf::RectangleShape rectangle3(sf::Vector2f(800, 150));
+	sf::RectangleShape rectangle3(sf::Vector2f(800, 200));
 	rectangle3.setFillColor(sf::Color(255, 255, 255));
 	rectangle3.setOutlineThickness(-20);
 	rectangle3.setOutlineColor(sf::Color(0, 0, 0));
-	rectangle3.setPosition(0, 300);
+	rectangle3.setPosition(0, 400);
 
-	sf::RectangleShape rectangle4(sf::Vector2f(800, 150));
+	sf::RectangleShape rectangle4(sf::Vector2f(800, 200));
 	rectangle4.setFillColor(sf::Color(255, 255, 255));
 	rectangle4.setOutlineThickness(-20);
 	rectangle4.setOutlineColor(sf::Color(0, 0, 0));
-	rectangle4.setPosition(0, 450);
+	rectangle4.setPosition(0, 600);
 
 
 	while (window.isOpen())
@@ -285,21 +144,21 @@ int printModeMenu(int mode)
 			{
 				window.close();
 			}
-			//Changes mode
+			//Changes difficulty
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 			{
-				if (mode > 1)
+				if (difficulty > 1)
 				{
-					circle.move(0, -150);
-					mode -= 1;
+					circle.move(0, -200);
+					difficulty -= 1;
 				}
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 			{
-				if (mode < 3)
+				if (difficulty < 3)
 				{
-					circle.move(0, 150);
-					mode += 1;
+					circle.move(0, 200);
+					difficulty += 1;
 				}
 			}
 			//Closes window
@@ -309,16 +168,16 @@ int printModeMenu(int mode)
 			}
 		}
 	}
+	this->difficulty = difficulty;
 }
-*/
 
 //Arguments to determine loss?
 //void printLoserScreen()
-int printLoserScreen()
+int Game:: printLoserScreen()
 {
 	int option = 2;
 	sf::RenderWindow window(sf::VideoMode(800, 800),
-		"HelloSFML", sf::Style::Default);
+		"Game Lost", sf::Style::Default);
 
 	sf::Font font;
 	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
@@ -345,7 +204,7 @@ int printLoserScreen()
 	text2.setFont(font);
 	text2.setPosition(300, 600);
 	text2.setFillColor(sf::Color::White);
-	text2.setString("REPLAY");
+	text2.setString("PLAY AGAIN");
 
 	sf::Text text3;
 	text3.setCharacterSize(40);
@@ -411,11 +270,11 @@ int printLoserScreen()
 
 //Arguments to determine win?
 //void printWinnerScreen()
-int printWinnerScreen()
+int Game:: printWinnerScreen()
 {
 	int option = 2;
 	sf::RenderWindow window(sf::VideoMode(800, 800),
-		"HelloSFML", sf::Style::Default);
+		"Game Won", sf::Style::Default);
 
 	sf::Font font;
 	font.loadFromFile("C:/Windows/Fonts/Arial.ttf");
@@ -442,7 +301,7 @@ int printWinnerScreen()
 	text2.setFont(font);
 	text2.setPosition(300, 600);
 	text2.setFillColor(sf::Color::White);
-	text2.setString("REPLAY");
+	text2.setString("PLAY AGAIN");
 
 	sf::Text text3;
 	text3.setCharacterSize(40);

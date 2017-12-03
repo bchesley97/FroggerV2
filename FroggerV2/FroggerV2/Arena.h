@@ -49,7 +49,8 @@ defines for traffic
 
 /****************** Defines for lilies ******************/
 
-#define NUMBER_OF_LILLIES (WINDOW_MAX_X/(2*FROG_SIZE))
+#define NUMBER_OF_LILLIES 2
+//(WINDOW_MAX_X/(3*FROG_SIZE))
 #define LILY_PAD_LENGTH (FROG_SIZE)
 #define LILY_PAD_WIDTH (FROG_SIZE) //ten is "wiggle room" on each side to land on
 
@@ -59,7 +60,7 @@ defines for traffic
 #define MIN_LOG_WIDTH (FROG_SIZE*3)
 
 #define CHAR_SIZE (20)
-#define TIME_TEXT_PLACEMENT_Y (WINDOW_MAX_Y - CHAR_SIZE)
+#define LIVES_TEXT_PLACEMENT_Y (WINDOW_MAX_Y - CHAR_SIZE-5)
 
 /************************* Data Structures *************************/
 
