@@ -1,3 +1,9 @@
+/*
+File: Menus.cpp 
+Purpose: Holds all implementation of multiple menus. Holds a welcome menu, a loser screen, a winner screen, and 
+
+*/
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "Game.h"
@@ -6,6 +12,12 @@ using namespace std;
 
 
 //Prints welcome menu
+/*
+Function: printWelcomeMenu
+Purpose: prints a welcome menu to the user. hitting enter will close the screen. this is a Game class method
+@param: void
+@return: void
+*/
 void Game::printWelcomeMenu()
 {
 	sf::RenderWindow window(sf::VideoMode(800, 600),
@@ -50,7 +62,12 @@ void Game::printWelcomeMenu()
 		}
 	}
 }
-
+/*
+Function: printDifficulty
+Purpose: prints a difficulty menu to the user, can choose multiple difficulty options. These choices are reflected in the game class member variables
+@param: void
+@return: void
+*/
 void Game:: printDifficultyMenu()
 {
 	//Initialize difficulty outside of function
@@ -171,8 +188,13 @@ void Game:: printDifficultyMenu()
 	this->difficulty = difficulty;
 }
 
-//Arguments to determine loss?
-//void printLoserScreen()
+/*
+Function: printLoserScreen
+Purpose: prints a loser menu to the user. Displays options "Menu" which returns a userm to the difficulty menu,
+		"play again" which restarts the game, and "exit" which exits the applications
+@param: void
+@return: option of choice
+*/
 int Game:: printLoserScreen()
 {
 	int option = 2;
@@ -268,8 +290,12 @@ int Game:: printLoserScreen()
 }
 
 
-//Arguments to determine win?
-//void printWinnerScreen()
+/*
+Function: printWinnerScreen
+Purpose: prints winner screen, with options to play again, go to the difficulty menu, or exit the application
+@param: void
+@return: int of which choice was made
+*/
 int Game:: printWinnerScreen()
 {
 	int option = 2;

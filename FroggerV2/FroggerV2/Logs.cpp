@@ -1,6 +1,16 @@
+/*
+File: Logs.cpp
+Purpose: Holds implementation of Logs class
+*/
+
 #pragma once
 #include "Logs.h"
 #include "Arena.h"
+
+/*
+Log default constructor. Sets the position, speed, and fill color of a log object, which is a rectangle with round edges
+
+*/
 Log::Log(int xPos, int yPos, int speed)
 {
 	int randomWidth = MIN_LOG_WIDTH + (rand() % 75);
@@ -14,6 +24,7 @@ Log::Log(int xPos, int yPos, int speed)
 
 }
 
+//getters / setters
 int Log::getSpeed()
 {
 	return speed;

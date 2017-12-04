@@ -21,9 +21,6 @@
     <ClCompile Include="Vehicle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Frog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,7 +43,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Lillies.cpp">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Threads.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,7 +72,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Lillies.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

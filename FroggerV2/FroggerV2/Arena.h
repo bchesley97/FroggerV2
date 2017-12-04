@@ -1,3 +1,9 @@
+/*
+File: Arena.h
+Purpose: This file holds all the defines used for the frogger game
+
+*/
+
 #pragma once
 #ifndef ARENA_H
 #define ARENA_H
@@ -18,7 +24,7 @@
 #define BACK_COLOR (sf::Color::White)
 
 /*
-defines for frog (will probably be changed)
+defines for frog 
 */
 #define FROG_SIZE (50)
 #define FROG_SIZE_D2 (FROG_SIZE >> 1)
@@ -54,18 +60,16 @@ defines for traffic
 #define LILY_PAD_LENGTH (FROG_SIZE)
 #define LILY_PAD_WIDTH (FROG_SIZE) //ten is "wiggle room" on each side to land on
 
-
+/********************* Defines for logs **********************/
 
 #define LOG_LENGTH (FROG_SIZE)
 #define MIN_LOG_WIDTH (FROG_SIZE*3)
 
+
+/************* Character / text defines ****************/
 #define CHAR_SIZE (20)
 #define LIVES_TEXT_PLACEMENT_Y (WINDOW_MAX_Y - CHAR_SIZE-5)
 
-/************************* Data Structures *************************/
-
-
-/********************************** Helper Functions **********************/
 
 
 #endif

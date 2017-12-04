@@ -16,7 +16,7 @@ Purpose: Contains class definition for Vehicle, which will be the super class fo
 
 /*
 
-Each Vehicle is a rectangle
+Each Vehicle has a rectangle object, as well as a speed and lane
 
 */
 class Vehicle {
@@ -24,7 +24,6 @@ class Vehicle {
 private:
 
 	int speed; //THIS SPEED IS IN PIXELS/SECOND
-	//int width_d2;
 	int lane;
 	sf::RectangleShape *shape;
 
@@ -36,23 +35,13 @@ public:
 
 	/* constructor for vehicle */
 	Vehicle::Vehicle(int centerX, int centerY, int speed, int width, int length, sf::Color color);
-		/*
-	int getCenterX();
-	int getCenterY();
-	*/
+
+	//getters / setters
 	int getSpeed();
 	int getLane();
 	sf::RectangleShape* getShape();
-
-	/*
-	void setCenterX(int centerX);
-	void setCenterY(int centerY);
-
-	*/
 	void setSpeed(int speed);
 	void setLane(int lane);
-
-	/**** implementation methods ****/
 
 };
 

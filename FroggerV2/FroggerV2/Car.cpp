@@ -1,3 +1,8 @@
+/*
+File: Car.cpp 
+Purpose: implementation fo the car class, just holds the constructors since a car is a vehicle
+*/
+
 #include "Car.h"
 #include "Vehicle.h"
 #include <iostream>
@@ -15,6 +20,5 @@ Car::Car()
 Car::Car(int centerX, int centerY, int speed, sf::Color color)
 	: Vehicle::Vehicle(centerX, centerY, speed, FROG_SIZE, FROG_SIZE, color) {
 
-	//std::cout << "In  car constructor\n";
-	//just calls super classes constructor, but creates two rectangle objects?
+//just calls its super class' constructo
 }

@@ -1,6 +1,16 @@
+/*
+File: RectangleRoundEdges.cpp
+Purpose: hold all implementation of the rectangleroundEdges class
+
+*/
+
 #include "RectangleRoundEdges.h"
 #include <cmath>
 
+/*
+constructor that sets the size, radius, and cornerpoint count
+
+*/
 RectangleRoundEdges::RectangleRoundEdges(const sf::Vector2f &size, float rad, uint32_t pointCount)
 {
 	this->size = size;
@@ -10,7 +20,7 @@ RectangleRoundEdges::RectangleRoundEdges(const sf::Vector2f &size, float rad, ui
 }
 
 
-
+//getters / setters. These files must be implemented as they are virtual methods in teh shape class (its super)
 void RectangleRoundEdges::setSize(const sf::Vector2f &size)
 {
 	this->size = size;

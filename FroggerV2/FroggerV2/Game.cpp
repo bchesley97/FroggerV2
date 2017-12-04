@@ -1,3 +1,9 @@
+/*
+File: Game.cpp
+Purpose: Holds implementation of Game class. This includes most of the functions used in the threads of the main program file (threads.cpp)
+*/
+
+
 #include "Game.h"
 #include "Frog.h"
 #include "Traffic.h"
@@ -27,29 +33,28 @@ Game::Game()
 		lillies.at(i).getShape()->setPosition(i * 4 * LILY_PAD_WIDTH + LILY_PAD_WIDTH + 10, 0); //at top of arena
 	}
 
-	win = false;
+	win = false; //havent won the game yet
 
 
 // NEED TO CALL CREATE WINDOW IF NECESSARY
 }
 
-
+//get window
 sf::RenderWindow* Game::getWindow()
 {
 	return window;
 }
-
+//create a new window member variable
 void Game::createWindow()
 {
 	window = new sf::RenderWindow(sf::VideoMode(WINDOW_MAX_X, WINDOW_MAX_Y),
 		"Frogger",
 		sf::Style::Default);
 }
-
+//getter / setter methods
 Traffic Game::getTraffic()
 {
 	return traffic;
-
 }
 
 Frog* Game::getFrog()
@@ -66,15 +71,6 @@ void Game::setEndOfGame(bool endOfGame)
 	this->endOfGame = endOfGame;
 }
 
-float Game::getTime()
-{
-	return time;
-}
-
-void Game::setTime(float time)
-{
-	this->time = time;
-}
 void Game::setDifficulty(int difficulty)
 {
 	this->difficulty = difficulty;
@@ -87,7 +83,33 @@ std::vector<Lilly> *Game:: getLillies()
 {
 	return &lillies;
 }
-//this will redraw the arena, use it as a window.clear()
+bool Game::getWin()
+{
+	return win;
+}
+int Game::getNumFrogsOnLillies()
+{
+	return numFrogsOnLillies;
+}
+void Game::frogDied()
+{
+	frogDead = true;
+}
+bool Game::didFrogDie()
+{
+	return frogDead;
+}
+
+void Game::newFrog()
+{
+	frogDead = false;
+}
+/*
+Function: updateScreen
+Purpose: this will redraw the arena, use it as a window.clear() in the thread file
+@param void
+@return void
+*/
 void Game::updateScreen()
 {
 	this->window->clear(sf::Color::White);
@@ -100,19 +122,18 @@ void Game::updateScreen()
 	}
 
 }
-bool Game::getWin()
-{
-	return win;
-}
-int Game::getNumFrogsOnLillies()
-{
-	return numFrogsOnLillies;
-}
+
+//increments the number of frogs on lillies
 void Game::incrementNumFrogsOnLillies()
 {
 	++numFrogsOnLillies;
 }
-
+/*
+Function: setDifficultyOfTraffic
+Purpose: adjusts the speed of the road and log traffic based on user input from a window
+@param void
+@return void
+*/
 void Game::setDifficultyOfTraffic()
 {
 
@@ -131,7 +152,7 @@ void Game::setDifficultyOfTraffic()
 		//hard
 		difficulty = 5;
 	}
-
+	//parse through all traffic and adjusts speed
 	for (int i = 0; i < NUMBER_OF_LANES / 2; i++)
 	{
 		for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
@@ -161,20 +182,16 @@ void Game::setDifficultyOfTraffic()
 	}
 
 }
-void Game::frogDied()
-{
-	frogDead = true;
-}
-bool Game::didFrogDie()
-{
-	return frogDead;
-}
 
-void Game::newFrog()
-{
-	frogDead = false;
-}
-//helper function to detect intersections between traffic and frog
+
+
+/*
+Function: intersects
+Purpose: returns true if the two passed rectangles intersect
+@param: two rectangle shape objects
+@return: true if the two rectangles intersect, false otherwise
+
+*/
 bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
 {
 	sf::FloatRect shape1 = rect1.getGlobalBounds();
@@ -185,13 +202,18 @@ bool intersects(sf::RectangleShape rect1, sf::RectangleShape rect2)
 
 //THESE COLLISION FUNCTIONS ARE FOR WHEN THE FROG MOVES FOR THE TRAFFIC SIDE OF ARENA
 
+/*
+Function: detectLeftCollision
+Purpose: Detects if a movement of the frog to the left collides with any traffic
+@param void
+@return boolean if collision occured
+*/
 bool Game::detectLeftCollision()
 {
 	if (frog->getLane() == NUMBER_OF_LANES  || frog->getLane() == 0)
 		return false;
 
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
-	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
 	int newLane = frog->getLane() - NUMBER_OF_LANES / 2 ;
@@ -201,7 +223,7 @@ bool Game::detectLeftCollision()
 
 		if (intersects(tempFrog, *traffic.getRoadTraffic()->at(newLane).at(j)->getShape()))
 		{
-			return true;
+			return true; //if intersects, return true
 		}
 
 	}
@@ -209,18 +231,23 @@ bool Game::detectLeftCollision()
 	return false;
 
 }
+/*
+Function: detectRightCollision
+Purpose: Detects if a movement of the frog to the right collides with any traffic
+@param void
+@return boolean if collision occured
+*/
 bool Game::detectRightCollision()
 {
 	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() == 0)
 		return false;
 
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
-	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
 	int newLane = frog->getLane() - NUMBER_OF_LANES / 2 ;
 
-
+	//parse through vehicles and check for collisions
 	for (int j = 0; j < MAX_NUMBER_OF_VEHICLES; j++)
 	{
 
@@ -232,12 +259,16 @@ bool Game::detectRightCollision()
 	}
 
 	return false;
-
 }
+/*
+Function: detectUpCollision
+Purpose: Detects if a movement of the frog upwards collides with any traffic
+@param void
+@return boolean if collision occured
+*/
 bool Game::detectUpCollision()
 {
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
-	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
 
@@ -250,15 +281,19 @@ bool Game::detectUpCollision()
 		{
 			return true;
 		}
-
 	}
-	
 	return false;
 }
+
+/*
+Function: detectBottomCollision
+Purpose: Detects if a movement of the frog dowbwards collides with any traffic
+@param void
+@return boolean if collision occured
+*/
 bool Game::detectBottomCollision()
 {
 	//need to create new temporary frog to update the position based on the vertical jump, then detect collisions with the new moved frog
-	// this is because the function SHOULD BE CALLED BEFORE THE FROG IS ACTUALLY MOVED 
 	sf::RectangleShape tempFrog(sf::Vector2f(FROG_SIZE, FROG_SIZE));
 	tempFrog.setPosition(frog->getShape()->getPosition().x, frog->getShape()->getPosition().y);
 	int newLane = frog->getLane() - NUMBER_OF_LANES / 2 + 1;
@@ -269,14 +304,17 @@ bool Game::detectBottomCollision()
 		{
 			return true;
 		}
-
 	}
-
 	return false;
 }
 
 //THESE COLLISION FUNCTIONS ARE FOR THE TRAFFIC, IE WHEN THE TRAFFIC IS MOVING
-
+/*
+Function: detectTrafficCollision
+Purpose: Detects if a movement of the traffic hits the frog (when the frog isnt moving)
+@param void
+@return boolean if collision occured
+*/
 bool Game::detectTrafficCollision()
 {
 	if (frog->getLane() == NUMBER_OF_LANES || frog->getLane() < NUMBER_OF_LANES/2)
@@ -292,11 +330,15 @@ bool Game::detectTrafficCollision()
 
 		}
 	}
-
 	return false;
 
 }
-
+/*
+Function: jumpOnLog
+Purpose: Detects if a movement upwards of a frog will result in jumping on the log
+@param void
+@return int, if -1 then frog didnt jump onto a log. Otherwise, returns the index of the log that the frog jumped onto
+*/
 int Game::jumpOnLog()
 {
 	int newLane = frog->getLane()-1;
@@ -338,9 +380,12 @@ int Game::jumpOffLog()
 	return -1;
 }
 
-
-//returns true if valid movement
-//left = 0, right = 1
+/*
+Function: jumpOnLog
+Purpose: Detects if a movement upwards of a frog will result in jumping on the log
+@param bool, if 1 then move to the right, if 0 then move to the left
+@return true if valid movement
+*/
 bool Game::moveOnLog(bool right)
 {
 	int newLane = frog->getLane();
@@ -377,7 +422,12 @@ bool Game::moveOnLog(bool right)
 
 }
 
-
+/*
+Function: jumpOnLilly
+Purpose: Detects if a movement upwards of a frog will result in jumping on a lilly
+@param void
+@return bool if lilly was jumped on 
+*/
 bool Game::jumpOnLilly()
 {
 	int wiggleRoom =  FROG_SIZE/3;

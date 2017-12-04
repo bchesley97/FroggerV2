@@ -1,8 +1,18 @@
+/*
+File:Vehcle.cpp
+Purpose: Holds all implementation of the vehicle class
+
+*/
+
 
 #include "Vehicle.h"
 #include <iostream>
 /**************************************** Constructors ***********************************************/
 
+/*
+Default constructor for Vehicle
+
+*/
 Vehicle::Vehicle() {
 
 
@@ -12,20 +22,16 @@ Vehicle::Vehicle() {
 
 }
 
+/*
+Constructor for Vehicle class which sets the position, size, speed, and color of the Vehicle
 
+*/
 Vehicle::Vehicle(int centerX, int centerY, int speed, int width, int length, sf::Color color) {
-
 
 	this->shape = new sf::RectangleShape(sf::Vector2f(width , length ));
 	this->speed = speed;
-	//this->width_d2 = size_d2;
-
-	//this->shape->setOrigin(centerX, centerY);
 	this->shape->setPosition(centerX, centerY);
-
 	this->shape->setFillColor(color);
-	//this->width_d2 = size_d2;
-	//std::cout << "In  vehicle constructor\n";
 
 }
 

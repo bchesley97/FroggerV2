@@ -1,6 +1,14 @@
+/*
+File: Traffic.cpp
+Purpose: Holds all implementation for the traffic class
+*/
+
 #include "Traffic.h"
+/*
+Traffic default constructor. Creates a vector of vectors of both vehicles and logs. Sets the 
+speed and position of the traffic
 
-
+*/
 Traffic::Traffic()
 {
 	//set up log traffic vector
@@ -61,7 +69,7 @@ Traffic::Traffic()
 		}
 	}
 }
-
+//getter methods
 std::vector<std::vector<Vehicle*> > *Traffic:: getRoadTraffic()
 {
 	return &roadTraffic;

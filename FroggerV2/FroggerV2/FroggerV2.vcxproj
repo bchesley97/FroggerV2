@@ -16,7 +16,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Lillies.cpp" />
     <ClCompile Include="Logs.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Threads.cpp" />
     <ClCompile Include="Arena.h" />
     <ClCompile Include="Menus.cpp" />
     <ClCompile Include="RectangleRoundEdges.cpp" />
