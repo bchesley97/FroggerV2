@@ -38,6 +38,7 @@ public:
 	void Frog::incrementLane(); //increment lane of frog
 	void Frog::decrementLane(); //decrement lane of frog
 	void decrementLives(); //frog died
+	void setSpeed(int speed);
 
 	void reset(); //reset cettain variables of the frog
 	void moveLeft(); //move across lanes

@@ -40,6 +40,10 @@ int Frog::getLane()
 {
 	return lane;
 }
+void Frog::setSpeed(int speed)
+{
+	this->speed = speed;
+}
 
 int Frog::getLogLane()
 {
